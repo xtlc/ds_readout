@@ -3,22 +3,14 @@ import time, csv, re
 from datetime import datetime
 
 class Mux:
-    def __init__(self, uid, device, CR="\x0D"):
+    def __init__(self, uid, device):
         self.uid = uid
         self.device = device
-        self.CR = CR
+        self.CR = "\x0D"
         self.create_port()
 
     def create_port(self, ):
-        self.ser = Serial(port=f"""/dev/{self.device}""",
-                          baudrate=9600,
-                          bytesize=EIGHTBITS,
-                          parity=PARITY_NONE,
-                          stopbits=STOPBITS_ONE,
-                          timeout=0.2,
-                          xonxoff=False,
-                          rtscts=False,
-                          dsrdtr=False)
+        self.ser = Serial(port=f"""/dev/{self.device}""", baudrate=9600, bytesize=EIGHTBITS, parity=PARITY_NONE, stopbits=STOPBITS_ONE, timeout=0.2, xonxoff=False, rtscts=False, dsrdtr=False)
 
     @staticmethod
     def calculate_crc(data):
@@ -43,8 +35,6 @@ class Mux:
         return results
 
     def muxwrite(self, pre, cmd, channel=""):
-        if not self.ser:
-            self.create_port()
         if channel == "":
             data = f"""{pre}{len(self.uid)+5}{cmd}{self.uid}"""
         else:
@@ -65,15 +55,10 @@ class Mux:
         time.sleep(0.2)
         return r.decode("utf-8").strip("\r")
 
-
     def get_all_weights(self):
         self.muxwrite(cmd="gl", pre="#")
         values = self.sanitize(mux_readout=self.muxread())
         return {f"{i:02}": values[i] for i in range(len(values))}
-
-
-
-
 
     def zero_scale(self, channel):
         self.muxwrite(pre="#", cmd="sz", channel=channel)
@@ -88,25 +73,33 @@ class Mux:
 
     def create_csv(self, max_values=None):
         csv_file_name = f"""log_from_{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}.csv"""
+        BOLD = "\033[1m"
+        RED = "\033[31m"
+        RESET = "\033[0m"
+        print(f"""csv file {csv_file_name} is being written ...\n""")
         with open(csv_file_name, mode="w", newline="") as csvfile:
-            fieldnames = ["mux", "timestamp", "scale_00", "scale_01", "scale_02", "scale_03", "scale_04", "scale_05", "scale_06", "scale_07"]
+            fieldnames = ["mux", "timestamp", *[f"scale_{i:02}" for i in range(8)]]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=";")
             writer.writeheader()
             counter = 0
             while True:
                 now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 w = self.get_all_weights()
-                l = {"mux": self.uid, "timestamp": now, "scale_00": w["00"], "scale_01": w["01"], "scale_02": w["02"], "scale_03": w["03"], "scale_04": w["04"], "scale_05": w["05"], "scale_06": w["06"], "scale_07": w["07"]}
-                writer.writerow(l)
+                datarow = {"mux": self.uid, "timestamp": now,  **{f"scale_{i:02}": w[f"{i:02}"] for i in range(8)}}
+                writer.writerow(datarow)
                 time.sleep(0.1)
                 counter += 1
+                scale_string = "  |  ".join([f"""{BOLD}{RED}{key}:{RESET} {datarow[key]}kg""" for key in datarow.keys() if key not in ["mux", "timestamp"]])
+                if max_values != None:
+                    print(f"""\r{counter:{f"""0{len(str(max_values))}"""}} / {max_values:{f"""0{len(str(max_values))}"""}} - scales: {scale_string}""", end="")
+                else:
+                    scales = ["""scale: {i}: {datarow[f"scale_{i:02}"]}"""]
+                    print(scales)
+                    print(f"""\r{counter:{f"""0{len(str(max_values))}"""}} - scales: {scale_string}""", end="")
 
-                if counter % 10 == 0:
-                    print(f"""{counter}/{max_values} finished ...""")
                 if counter == max_values and max_values != None:
                     print("we are done here")
                     return
-
 
 
 con = Mux(device=f"ttyUSB0", uid="0120211005135155")
