@@ -39,7 +39,6 @@ class Mux:
             data = f"""{pre}{len(self.uid)+5}{cmd}{self.uid}"""
         else:
             data = f"""{pre}{len(self.uid)+6}{cmd}{self.uid}{channel}"""
-            print("....", data)
         CC = self.calculate_crc(data)
         cmd = f"""{data}{CC}{self.CR}"""
         return self.ser.write(cmd.encode("utf-8"))
@@ -101,7 +100,11 @@ class Mux:
                     print("we are done here")
                     return
 
-
+#board1
 con = Mux(device=f"ttyUSB0", uid="0120211005135155")
-#con.zero_scale(3)
+
+#board2
+#con = Mux(device=f"ttyUSB0", uid="0120211005135902")
+#con.zero_all_scales()
+
 con.create_csv(max_values=20)
