@@ -1,0 +1,6 @@
+The RS485 <--> USB tool used:  Hailege CP2102 USB zu TTL UART 232 485 Port Mutual Convert Adapter USB Serial Port Adapter 6 in One
+Link on Amazon: https://www.amazon.de/dp/B07XZ3PV8T/ref=sspa_dk_detail_0?psc=1&pd_rd_i=B07XZ3PV8T&pd_rd_w=DnQW7&content-id=amzn1.sym.6ffc9ff7-fa31-49da-8594-196e74bcf61e&pf_rd_p=6ffc9ff7-fa31-49da-8594-196e74bcf61e&pf_rd_r=556T3GB8N8YZ7T75E8N7&pd_rd_wg=pdoKq&pd_rd_r=1a8c8778-3020-4ff7-8df9-b70d796d49fb&s=industrial&sp_csd=d2lkZ2V0TmFtZT1zcF9kZXRhaWw
+
+Connect the GND of the connector and the PSU to one line (must be connected) - see PPTX for installation details.
+
+mux is the name of the multiplexer, it can be read on the back of the scale boards (or take the UID of a scale and skip the last two digits). This is only valid for the e-nventory boards!
