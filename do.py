@@ -93,7 +93,6 @@ class Mux:
                     print(f"""\r{counter:{f"""0{len(str(max_values))}"""}} / {max_values:{f"""0{len(str(max_values))}"""}} - scales: {scale_string}""", end="")
                 else:
                     scales = ["""scale: {i}: {datarow[f"scale_{i:02}"]}"""]
-                    print(scales)
                     print(f"""\r{counter:{f"""0{len(str(max_values))}"""}} - scales: {scale_string}""", end="")
 
                 if counter == max_values and max_values != None:
