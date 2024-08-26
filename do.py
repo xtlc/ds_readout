@@ -92,7 +92,9 @@ class Mux:
             self.zero_scale(channel=i)
 
     def to_influx(self, client):
+        counter = 0
         while True:
+            print(f"\r{counter} measurement ongoing ...", end="")
             for scale, weight in self.get_all_weights().items():
                 p = Point("digisense_test_1").field(f"scale_{scale}", float(weight)*1000).time(datetime.utcnow())
                 client.write(record=p)
