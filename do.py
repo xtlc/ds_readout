@@ -1,6 +1,27 @@
 from serial import Serial, EIGHTBITS, STOPBITS_ONE, PARITY_NONE
 import time, csv, re
-from datetime import datetime
+from environs import Env
+from influxdb_client_3 import InfluxDBClient3, Point
+from datetime import datetime, timezone
+
+
+# Initialize the environment
+env = Env()
+
+# Read the .env file
+env.read_env()
+
+# InfluxDB parameters
+token = env("INFLUX_TOKEN")
+org = "abaton_influx"
+host = "https://eu-central-1-1.aws.cloud2.influxdata.com"
+bucket = env("BUCKET")
+
+client = InfluxDBClient3(host=host, database=bucket, token=token, org=org)
+
+
+
+
 
 class Mux:
     def __init__(self, uid, device):
@@ -70,6 +91,15 @@ class Mux:
         for i in range(0, 8):
             self.zero_scale(channel=i)
 
+    def to_influx(self, client):
+        while True:
+            for scale, weight in self.get_all_weights().items():
+                p = Point("digisense_test_1").field(f"scale_{scale}", float(weight)*1000).time(datetime.utcnow())
+                client.write(record=p)
+            time.sleep(60)
+
+       
+
     def create_csv(self, max_values=None):
         csv_file_name = f"""log_from_{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}.csv"""
         BOLD = "\033[1m"
@@ -89,21 +119,22 @@ class Mux:
                 time.sleep(0.1)
                 counter += 1
                 scale_string = "  |  ".join([f"""{BOLD}{RED}{key}:{RESET} {datarow[key]}kg""" for key in datarow.keys() if key not in ["mux", "timestamp"]])
+                m = f"""0{len(str(max_values))}"""
                 if max_values != None:
-                    print(f"""\r{counter:{f"""0{len(str(max_values))}"""}} / {max_values:{f"""0{len(str(max_values))}"""}} - scales: {scale_string}""", end="")
+                    print(f"""\r{counter:{m}} / {max_values:{m}} - scales: {scale_string}""", end="")
                 else:
-                    scales = ["""scale: {i}: {datarow[f"scale_{i:02}"]}"""]
-                    print(f"""\r{counter:{f"""0{len(str(max_values))}"""}} - scales: {scale_string}""", end="")
+                    # scales = ["""scale: {i}: {datarow[f"scale_{i:02}"]}"""]
+                    print(f"""\r{counter:{m}} - scales: {scale_string}""", end="")
 
                 if counter == max_values and max_values != None:
                     print("we are done here")
                     return
 
 #board1
-con = Mux(device=f"ttyUSB0", uid="0120211005135155")
+#con = Mux(device=f"ttyUSB0", uid="0120211005135155")
 
 #board2
-#con = Mux(device=f"ttyUSB0", uid="0120211005135902")
+con = Mux(device=f"ttyUSB0", uid="0120211005135902")
 #con.zero_all_scales()
-
-con.create_csv(max_values=20)
+con.to_influx(client=client)
+#con.create_csv(max_values=20)
