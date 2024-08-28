@@ -24,11 +24,12 @@ client = InfluxDBClient3(host=host, database=bucket, token=token, org=org)
 
 
 class Mux:
-    def __init__(self, uid, device):
+    def __init__(self, uid, device, number_of_scales):
         self.uid = uid
         self.device = device
         self.CR = "\x0D"
         self.create_port()
+        self.SCALES = number_of_scales
 
     def create_port(self, ):
         self.ser = Serial(port=f"""/dev/{self.device}""", baudrate=9600, bytesize=EIGHTBITS, parity=PARITY_NONE, stopbits=STOPBITS_ONE, timeout=0.2, xonxoff=False, rtscts=False, dsrdtr=False)
@@ -41,12 +42,15 @@ class Mux:
         crc_hex = format(crc, "02x")
         return crc_hex
 
-    @staticmethod
-    def sanitize(mux_readout):
+    def sanitize(self, mux_readout):
         # Regular expression to match the required pattern
         pattern = r"([-]?\d{5})\.(\d{3})"
+        # pattern = r"\d{5}\.\d{3}"
         # Find all matches in the serial output
         matches = re.findall(pattern, mux_readout)
+
+        ## sometimes more scales are returned than physically exist
+        matches = matches[:self.SCALES]
         results = []
         # Process each match
         for match in matches:
@@ -73,22 +77,26 @@ class Mux:
         """
         r = self.ser.read_until(self.CR)
         time.sleep(0.2)
-        return r.decode("utf-8").strip("\r")
+        return r.decode("utf-8").strip("\r") 
+
 
     def get_all_weights(self):
         self.muxwrite(cmd="gl", pre="#")
-        values = self.sanitize(mux_readout=self.muxread())
+        r = self.muxread()
+        values = self.sanitize(mux_readout=r)
         return {f"{i:02}": values[i] for i in range(len(values))}
 
     def zero_scale(self, channel):
-        self.muxwrite(pre="#", cmd="sz", channel=channel)
-        if "OK" in self.muxread():
+        w = self.muxwrite(pre="#", cmd="sz", channel=channel)
+        r = self.muxread()
+        time.sleep(1)
+        if "OK" in r:
             print(f"""scale {channel} successfully calibrated""")
         else:
             print(f"""scale {channel} was not calibrated""")
 
     def zero_all_scales(self):
-        for i in range(0, 8):
+        for i in range(self.SCALES):
             self.zero_scale(channel=i)
 
     def to_influx(self, client):
@@ -98,12 +106,16 @@ class Mux:
             for scale, weight in self.get_all_weights().items():
                 p = Point("digisense_test_1").field(f"scale_{scale}", float(weight)*1000).time(datetime.utcnow())
                 client.write(record=p)
+            counter += 1
             time.sleep(60)
-
-       
+        
+    def get_revision(self):
+        self.muxwrite(cmd="gr", pre="#")
+        values = mux_readout=self.muxread()
+        return values.replace("#06", "")
 
     def create_csv(self, max_values=None):
-        csv_file_name = f"""log_from_{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}.csv"""
+        csv_file_name = f"""log_from_{datetime.now().strftime("%Y-%m-%d___%H-%M-%S")}.csv"""
         BOLD = "\033[1m"
         RED = "\033[31m"
         RESET = "\033[0m"
@@ -116,7 +128,7 @@ class Mux:
             while True:
                 now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 w = self.get_all_weights()
-                datarow = {"mux": self.uid, "timestamp": now,  **{f"scale_{i:02}": w[f"{i:02}"] for i in range(8)}}
+                datarow = {"mux": self.uid, "timestamp": now,  **{f"scale_{i:02}": w[f"{i:02}"] for i in range(self.SCALES)}}
                 writer.writerow(datarow)
                 time.sleep(0.1)
                 counter += 1
@@ -132,11 +144,34 @@ class Mux:
                     print("we are done here")
                     return
 
+mux_4kg_1 = "0120211005135155"
+mux_4kg_2 = "0120211005135902"
+mux_8kg_1 = "0020240425142741"
+
+usb = f"ttyUSB0"
+
+con = Mux(device=usb, uid=mux_8kg_1, number_of_scales=4)
+rev = con.get_revision()
+
+print("scale revision:", rev)
+#con.zero_all_scales()
+#time.sleep(2)
+con.to_influx(client=client)
+
+
+# while True:
+#     w = con.get_all_weights()
+#     print(w, "<---")
+#     time.sleep(0.2)
+
+
 #board1
 #con = Mux(device=f"ttyUSB0", uid="0120211005135155")
 
 #board2
-con = Mux(device=f"ttyUSB0", uid="0120211005135902")
+#con = Mux(     device=f"ttyUSB0",      uid="0120211005135902", number_of_scales=8)
+#con_8kg = Mux(  device=f"ttyUSB0",      uid="00202425142741",   number_of_scales=4)
 #con.zero_all_scales()
-con.to_influx(client=client)
-#con.create_csv(max_values=20)
+# con.to_influx(client=client)
+# con_8kg.zero_all_scales()
+#con_8kg.create_csv(max_values=20)
