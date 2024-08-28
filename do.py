@@ -89,7 +89,7 @@ class Mux:
     def zero_scale(self, channel):
         w = self.muxwrite(pre="#", cmd="sz", channel=channel)
         r = self.muxread()
-        time.sleep(1)
+        time.sleep(2)
         if "OK" in r:
             print(f"""scale {channel} successfully calibrated""")
         else:
@@ -154,7 +154,8 @@ con = Mux(device=usb, uid=mux_8kg_1, number_of_scales=4)
 rev = con.get_revision()
 
 print("scale revision:", rev)
-#con.zero_all_scales()
+con.zero_all_scales()
+exit()
 #time.sleep(2)
 con.to_influx(client=client)
 
