@@ -65,6 +65,7 @@ class Mux:
             data = f"""{pre}{len(self.UID)+6}{cmd}{self.UID}{channel}"""
         CC = self.calculate_crc(data)
         cmd = f"""{data}{CC}{self.CR}"""
+        print("mux write:", cmd.encode("utf-8"))
         return self.ser.write(cmd.encode("utf-8"))
 
     def muxread(self):
@@ -239,10 +240,6 @@ def check_args(args):
     return usb_port, mux, output_method, measurements_interval, num_measurements, zero
 
     
-    
-
-
-
 if __name__ == "__main__":
     mux_dict = {1: {"uid": "0120211005135155", "comment": "mux_4kg_1", "number_of_scales": 8}, 
                 2: {"uid": "0120211005135902", "comment": "mux_4kg_2", "number_of_scales": 8},
