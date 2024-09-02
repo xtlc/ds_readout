@@ -39,7 +39,7 @@ class Mux:
         crc = 0
         for byte in data:
             crc ^= ord(byte)
-        crc_hex = format(crc, "02x")
+        crc_hex = format(crc, "02x").upper()
         return crc_hex
 
     def sanitize(self, mux_readout):
@@ -49,7 +49,7 @@ class Mux:
         matches = re.findall(pattern, mux_readout)
 
         ## sometimes more scales are returned than physically exist
-        matches = matches[:self.SCALES]
+        # matches = matches[]
         results = []
         # Process each match
         for match in matches:
@@ -65,7 +65,7 @@ class Mux:
             data = f"""{pre}{len(self.UID)+6}{cmd}{self.UID}{channel}"""
         CC = self.calculate_crc(data)
         cmd = f"""{data}{CC}{self.CR}"""
-        print("mux write:", cmd.encode("utf-8"))
+        # print("mux write:", cmd.encode("utf-8"))
         return self.ser.write(cmd.encode("utf-8"))
 
     def muxread(self):
@@ -108,12 +108,23 @@ class Mux:
     def view_output(self, scale_values):
         BOLD = "\033[1m"
         RED = "\033[31m"
+        YELLOW = "\033[33m"
+        CYAN = "\033[36m"
+        BLUE = "\033[34m"
         RESET = "\033[0m"
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         m = f"""0{len(str(self.MAX_VALUES))}"""
         out = f"""{self.COUNTER:{m}} / {self.MAX_VALUES:{m}} - scales: """
-        scale_string = "  |  ".join([f"""{BOLD}{RED}{key}:{RESET} {scale_values[key]}kg""" for key in scale_values.keys() if key not in ["mux", "timestamp"]])
+        if self.SCALES == 8:
+            scale_string = "  |  ".join([f"""{BOLD}{RED}{key}:{RESET} {scale_values[key]}kg""" for key in scale_values.keys() if key not in ["mux", "timestamp"]])
+        elif self.SCALES == 4:
+            # Convert keys to a list for slicing
+            keys_list = list(scale_values.keys())
+            values_kg = [f"""{BOLD}{RED}{key}:{RESET} {scale_values[key]}kg""" for key in keys_list[:3]]
+            values_gc = [f"""{BOLD}{CYAN}{key}:{RESET} {float(scale_values[key]):06.2f}°C""" for key in keys_list[4:]]
+            scale_string = "  |  ".join(values_kg + values_gc)
+
         print(f"""\r{out}{scale_string}""", end="")
         
         if self.COUNTER == self.MAX_VALUES:
@@ -204,7 +215,7 @@ def check_args(args):
     # Check if at least one of -n or -t is provided
     if args.num_measurements is None and args.time is None:
         print("Error: You must provide either -n (number of measurements) or -t (time in minutes).")
-        sys.exit(1)  # Exit the script with a non-zero status
+        exit(1)  # Exit the script with a non-zero status
     elif args.time is None:
         print(f"Quitting after {args.num_measurements} measurements.")
     elif args.num_measurements is None:
@@ -212,9 +223,9 @@ def check_args(args):
 
     if args.granularity is None:
         measurements_interval = 1
-    elif 0.01 < args.granularity < 12:
-        measurements_interval = args.granularity
-        print(f"measure interval was set to {measurements_interval} measures per minute")
+    elif 0.01 < args.granularity <= 12:
+        measurements_interval = 60 / args.granularity
+        print(f"measure interval was set to {args.granularity} measures per minute = every {measurements_interval}s ")
     else:
         print("this interval cannot be used. please choose a value between 1 measurement per hour and 1 measurement every second")
         exit()  
@@ -223,7 +234,7 @@ def check_args(args):
         predicted_time = args.num_measurements * measurements_interval
         num_measurements = args.num_measurements
     elif args.time:
-        num_measurements = int(args.time * 1 / measurements_interval)
+        num_measurements = int(args.time * measurements_interval)
         predicted_time = args.time
     print(f"""{num_measurements} measurements will be done in {fmt_time(predicted_time)} - one measurement every {measurements_interval} seconds""")
     
@@ -259,7 +270,7 @@ if __name__ == "__main__":
     group_number.add_argument("-t", "--time", type=int, help="Quit after t minutes")
 
     parser.add_argument("-z", "--zero", action="store_true", help="Zero all scales")
-    parser.add_argument("-g", "--granularity", type=float, help="granularity - how often in one minute should be measured?")
+    parser.add_argument("-g", "--granularity", type=float, help="granularity - how often in one minute should be measured? Max = 12")
     parser.add_argument("-u", "--usb", type=str, help="Define USB in Linux device name (e.g., ttyUSB0)")
     parser.add_argument("-m", "--mux", type=int, choices=mux_dict.keys(), help=f"Choose mux. Options are {mux_dict.keys()}")
 
