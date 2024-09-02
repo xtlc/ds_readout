@@ -121,9 +121,13 @@ class Mux:
         elif self.SCALES == 4:
             # Convert keys to a list for slicing
             keys_list = list(scale_values.keys())
-            values_kg = [f"""{BOLD}{RED}{key}:{RESET} {scale_values[key]}kg""" for key in keys_list[:3]]
-            values_gc = [f"""{BOLD}{CYAN}{key}:{RESET} {float(scale_values[key]):06.2f}°C""" for key in keys_list[4:]]
-            scale_string = "  |  ".join(values_kg + values_gc)
+            t = []
+            for idx, key in enumerate(keys_list):
+                if idx < 4:
+                    t.append(f"""{BOLD}{RED}{key}:{RESET} {float(scale_values[key]):06.3f}kg""")
+                else:
+                    t.append(f"""{BOLD}{CYAN}{key}:{RESET} {float(scale_values[key]):06.2f}°C""")
+            scale_string = "  |  ".join(t)
 
         print(f"""\r{out}{scale_string}""", end="")
         
