@@ -81,7 +81,11 @@ class Mux:
     def get_all_weights(self):
         if self.COUNTER != 0:
             time.sleep(self.SLEEP)
-        self.COUNTER += 1
+        
+        if self.MAX_VALUES != 0: ## if it is 0 continuos polling
+            self.COUNTER += 1
+        if self.COUNTER == self.MAX_VALUES:
+            exit()
         self.muxwrite(cmd="gl", pre="#")
         r = self.muxread()
         values = self.sanitize(mux_readout=r)
@@ -149,9 +153,6 @@ class Mux:
                 writer.writerow(datarow)
                 self.view_output(scale_values=w)
 
-                if self.COUNTER == self.MAX_VALUES:
-                    return
-
     def to_influx(self, client, db_name="digisense_test_1"):
         while True:
             w = self.get_all_weights()
@@ -160,16 +161,19 @@ class Mux:
                 p = Point(db_name).field(f"scale_{scale}", float(weight) * 1000).time(datetime.utcnow())
                 client.write(record=p)
 
-            if self.COUNTER == self.MAX_VALUES:
-                return
-
     def to_terminal(self):
         while True:
             w = self.get_all_weights()
             self.view_output(scale_values=w)
 
-            if self.COUNTER == self.MAX_VALUES:
-                return
+class Temp:
+    def __init__(self, ):
+        self.temps = self.get_sensors()
+
+    def get_sensors(self):
+        for i in ["d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",]:
+            pass
+        return
 
 
 def check_args(args):
@@ -188,7 +192,6 @@ def check_args(args):
                 result.append(f"{value}{name}")
         t = " ".join(result[:granularity])
         return t + " s"
-
 
    # Use the USB device name, defaulting to ttyUSB0 if not provided
     usb_port = args.usb if args.usb else "ttyUSB0"
@@ -217,30 +220,29 @@ def check_args(args):
 
 
     # Check if at least one of -n or -t is provided
-    if args.num_measurements is None and args.time is None:
-        print("Error: You must provide either -n (number of measurements) or -t (time in minutes).")
-        exit(1)  # Exit the script with a non-zero status
-    elif args.time is None:
-        print(f"Quitting after {args.num_measurements} measurements.")
-    elif args.num_measurements is None:
-        print(f"Quitting after {args.time} minutes.")
-
-    if args.granularity is None:
-        measurements_interval = 1
-    elif 0.01 < args.granularity <= 12:
-        measurements_interval = 60 / args.granularity
-        print(f"measure interval was set to {args.granularity} measures per minute = every {measurements_interval}s ")
+    if args.measurements is None:
+            measurements = 0
     else:
-        print("this interval cannot be used. please choose a value between 1 measurement per hour and 1 measurement every second")
-        exit()  
+        try:
+            measurements = args.measurements
+        except Exception as E:
+            print("Error with number of measurements -> could not process", E)
+            exit()
+    if args.granularity is None:
+        print("Error: You must provide -g (granularity)")
+        exit()  # Exit the script with a non-zero status
+    else:
+        try:
+            granularity = int(args.granularity)
+        except Exception as E:
+            print("Error with number of measurements -> could not process", E)
+            exit()
+    
+    if measurements > 0:
+        print(f"{measurements} will be done, one every {granularity} seconds - this will take approx { fmt_time(measurements * granularity)}")
+    else:
+        print(f"measurements will be done continuosly, one every {granularity} seconds")
 
-    if args.num_measurements:
-        predicted_time = args.num_measurements * measurements_interval
-        num_measurements = args.num_measurements
-    elif args.time:
-        num_measurements = int(args.time * measurements_interval)
-        predicted_time = args.time
-    print(f"""{num_measurements} measurements will be done in {fmt_time(predicted_time)} - one measurement every {measurements_interval} seconds""")
     
     # If no mutually exclusive options are provided, default to verbose
     if not (args.influx or args.csv):
@@ -252,7 +254,7 @@ def check_args(args):
     elif args.csv:
         print(f"Writing data to CSV file")
         output_method = "csv"
-    return usb_port, mux, output_method, measurements_interval, num_measurements, zero
+    return usb_port, mux, output_method, measurements, granularity, zero
 
     
 if __name__ == "__main__":
@@ -264,25 +266,20 @@ if __name__ == "__main__":
 
     ## select where the script will show/save it"s data
     group_save = parser.add_mutually_exclusive_group(required=False)
-    group_save.add_argument("-i", "--influx", action="store_true", help="Write data continuously to InfluxDB")
+    group_save.add_argument("-i", "--influx", action="store_true", help="Write data to InfluxDB")
     group_save.add_argument("-c", "--csv", action="store_true", help="Write data to CSV")
     group_save.add_argument("-v", "--verbose", action="store_true", help="Output values to terminal")
 
-    ## define how many or how long the script will run
-    group_number = parser.add_mutually_exclusive_group(required=False)
-    group_number.add_argument("-n", "--num_measurements", type=int, help="Quit after n measurements")
-    group_number.add_argument("-t", "--time", type=int, help="Quit after t minutes")
-
+    parser.add_argument("-n", "--measurements", type=int, help="Quit after n measurements, set 0 for continuos measurement")
+    parser.add_argument("-g", "--granularity", type=int, help="granularity - seconds between measurements")
     parser.add_argument("-z", "--zero", action="store_true", help="Zero all scales")
-    parser.add_argument("-g", "--granularity", type=float, help="granularity - how often in one minute should be measured? Max = 12")
     parser.add_argument("-u", "--usb", type=str, help="Define USB in Linux device name (e.g., ttyUSB0)")
     parser.add_argument("-m", "--mux", type=int, choices=mux_dict.keys(), help=f"Choose mux. Options are {mux_dict.keys()}")
 
     args = parser.parse_args()
 
-
-    usb_port, mux, output_method, measurements_interval, num_measurements, zero = check_args(args)
-    con = Mux(device=usb_port, uid=mux_dict[args.mux]["uid"], number_of_scales=mux_dict[args.mux]["number_of_scales"], max_values=num_measurements, sleep_time=measurements_interval)
+    usb_port, mux, output_method, measurements, granularity, zero = check_args(args)
+    con = Mux(device=usb_port, uid=mux_dict[args.mux]["uid"], number_of_scales=mux_dict[args.mux]["number_of_scales"], max_values=measurements, sleep_time=granularity)
 
 
     if not (rev := con.get_revision()):
