@@ -3,6 +3,7 @@ import time, csv, re, argparse
 from environs import Env
 from influxdb_client_3 import InfluxDBClient3, Point
 from datetime import datetime, timezone
+import os
 
 
 # Initialize the environment
@@ -21,6 +22,9 @@ client = InfluxDBClient3(host=host, database=bucket, token=token, org=org)
 
 
 class Mux:
+    """
+    output looks like this: [weights_1, weights_2, weights_3, weights_4, temp_1, temp_2, temp_3, temp_4]
+    """
     def __init__(self, uid, device, number_of_scales, max_values, sleep_time=60):
         self.UID = uid
         self.DEVICE = device
@@ -32,7 +36,26 @@ class Mux:
         self.SLEEP = sleep_time
 
     def create_port(self, ):
-        self.ser = Serial(port=f"""/dev/{self.DEVICE}""", baudrate=9600, bytesize=EIGHTBITS, parity=PARITY_NONE, stopbits=STOPBITS_ONE, timeout=0.2, xonxoff=False, rtscts=False, dsrdtr=False)
+        if os.name == "nt":
+            self.ser = Serial(port=f"""{self.DEVICE}""", 
+                              baudrate=9600, 
+                              bytesize=EIGHTBITS, 
+                              parity=PARITY_NONE, 
+                              stopbits=STOPBITS_ONE, 
+                              timeout=0.2, 
+                              xonxoff=False, 
+                              rtscts=False, 
+                              dsrdtr=False)
+        else:
+            self.ser = Serial(port=f"""/dev/{self.DEVICE}""", 
+                              baudrate=9600, 
+                              bytesize=EIGHTBITS, 
+                              parity=PARITY_NONE, 
+                              stopbits=STOPBITS_ONE, 
+                              timeout=0.2, 
+                              xonxoff=False, 
+                              rtscts=False, 
+                              dsrdtr=False)
 
     @staticmethod
     def calculate_crc(data):
@@ -106,7 +129,8 @@ class Mux:
         
     def get_revision(self):
         self.muxwrite(cmd="gr", pre="#")
-        values = mux_readout=self.muxread()
+        values = self.muxread()
+        print(f"did this --> {values} <-- work?")
         return values.replace("#06", "")
 
     def view_output(self, scale_values):
@@ -132,48 +156,133 @@ class Mux:
                 else:
                     t.append(f"""{BOLD}{CYAN}{key}:{RESET} {float(scale_values[key]):06.2f}°C""")
             scale_string = "  |  ".join(t)
+        else:
+            print("just printing the output:", scale_values)
+
 
         print(f"""\r{out}{scale_string}""", end="")
         
         if self.COUNTER == self.MAX_VALUES:
             return
 
-    def to_csv(self):
-        csv_file_name = f"""log_from_{datetime.now().strftime("%Y-%m-%d___%H-%M-%S")}.csv"""
-        
-        print(f"""csv file {csv_file_name} is being written ...\n""")
-        with open(csv_file_name, mode="w", newline="") as csvfile:
-            fieldnames = ["mux", "timestamp", *[f"scale_{i:02}" for i in range(self.SCALES)]]
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=";")
-            writer.writeheader()
-            while True:
-                now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                w = self.get_all_weights()
-                datarow = {"mux": self.UID, "timestamp": now,  **{f"scale_{i:02}": w[f"{i:02}"] for i in range(self.SCALES)}}
-                writer.writerow(datarow)
-                self.view_output(scale_values=w)
+class Measurement:
+    def __init__(self, device_temp_usb=None, device_scale_usb=None, scale_uid=None, number_of_scales=0, measurements=0, sleep_time=60, client=None):
+        if device_scale_usb:
+            self.scales = Mux(device=device_scale_usb, uid=scale_uid, number_of_scales=number_of_scales, max_values=measurements, sleep_time=sleep_time)
+            self.number_of_scales = number_of_scales
+        if device_temp_usb:
+            self.temps = Temp(device=device_temp_usb)
+        if client:
+            self.client = client
+        self.wait_time = sleep_time ## seconds
 
-    def to_influx(self, client, db_name="digisense_test_1"):
+    # def to_csv(self):
+    #     csv_file_name = f"""log_from_{datetime.now().strftime("%Y-%m-%d___%H-%M-%S")}.csv"""
+        
+    #     print(f"""csv file {csv_file_name} is being written ...\n""")
+    #     with open(csv_file_name, mode="w", newline="") as csvfile:
+    #         fieldnames = ["mux", "timestamp", *[f"scale_{i:02}" for i in range(self.SCALES)]]
+    #         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=";")
+    #         writer.writeheader()
+    #         while True:
+    #             now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    #             w = self.get_all_weights()
+    #             datarow = {"mux": self.UID, "timestamp": now,  **{f"scale_{i:02}": w[f"{i:02}"] for i in range(self.SCALES)}}
+    #             writer.writerow(datarow)
+    #             self.view_output(scale_values=w)
+
+    def to_influx(self, db_name="teststand_1"):
         while True:
-            w = self.get_all_weights()
-            self.view_output(scale_values=w)
-            for scale, weight in w.items():
-                p = Point(db_name).field(f"scale_{scale}", float(weight) * 1000).time(datetime.utcnow())
-                client.write(record=p)
+            w = self.scales.get_all_weights()
+            t = self.temps.get_all_temps()
+            time.sleep(self.wait_time)
+            #for scale, weight in w.items():
+            #    p = Point(db_name).field(f"scale_{scale}", float(weight) * 1000).time(datetime.utcnow())
+            #    client.write(record=p)
+
+            if self.number_of_scales == 1:
+                now = datetime.utcnow()
+                p_01 = Point(db_name).field(f"scale_1", float(w["00"]) * 1000, ).time(now)
+                client.write(record=p_01)
+                p_02 = Point(db_name).field(f"temp_left_bot",  float(t[0]["temperature"])).time(now)
+                client.write(record=p_02)
+                p_03 = Point(db_name).field(f"humid_left_bot", float(t[0]["humidity"])).time(now)
+                client.write(record=p_03)
+                p_04 = Point(db_name).field(f"temp_left_top",  float(t[1]["temperature"])).time(now)
+                client.write(record=p_04)
+                p_05 = Point(db_name).field(f"humid_left_top", float(t[1]["humidity"])).time(now)
+                client.write(record=p_05)
+                p_06 = Point(db_name).field(f"temp_mid_bot",  float(t[2]["temperature"])).time(now)
+                client.write(record=p_06)
+                p_07 = Point(db_name).field(f"humid_mid_bot", float(t[2]["humidity"])).time(now)
+                client.write(record=p_07)
+                p_08 = Point(db_name).field(f"temp_mid_top", float(t[3]["temperature"])).time(now)
+                client.write(record=p_08)
+                p_09 = Point(db_name).field(f"humi_mid_top",  float(t[3]["humidity"])).time(now)
+                client.write(record=p_09)
+                p_10 = Point(db_name).field(f"temp_right_bot", float(t[4]["temperature"])).time(now)
+                client.write(record=p_10)
+                p_11 = Point(db_name).field(f"humid_right_bot", float(t[4]["humidity"])).time(now)
+                client.write(record=p_11)
+                p_12 = Point(db_name).field(f"temp_right_top", float(t[5]["temperature"])).time(now)
+                client.write(record=p_12)
+                p_13 = Point(db_name).field(f"humid_right_top", float(t[5]["humidity"])).time(now)
+                client.write(record=p_13)
+                print("points written to influx: ", now)
 
     def to_terminal(self):
         while True:
-            w = self.get_all_weights()
-            self.view_output(scale_values=w)
+            w = self.scales.get_all_weights()
+            t = self.temps.get_all_temps()
+            print("---> w -->", w)
+            print("---> t -->", t)
+            time.sleep(self.wait_time)
 
 class Temp:
-    def __init__(self, ):
-        self.temps = self.get_sensors()
+    def __init__(self, device, ):
+        self.DEVICE = device
+        self.create_port()
+        self.CR = "\x0D"
+        self.sensors = self.get_all_temps()
+        print("available temp sensors:", self.sensors)
+    
+    def create_port(self, ):
+        if os.name == "nt":
+            dev = f"""{self.DEVICE}"""
+        else:
+            dev = f"""/dev/{self.DEVICE}"""
+        self.ser = Serial(port=dev, 
+                          baudrate=9600, 
+                          bytesize=EIGHTBITS, 
+                          parity=PARITY_NONE, 
+                          stopbits=STOPBITS_ONE, 
+                          timeout=0.2, 
+                          xonxoff=False, 
+                          rtscts=False, 
+                          dsrdtr=False)
 
-    def get_sensors(self):
+    def get_all_temps(self):
+        sensors = []
         for i in ["d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",]:
-            pass
-        return
+            self.serwrite(cmd=i)
+            time.sleep(0.1)
+            try:
+                values = self.sanitize(self.serread())
+                sensors.append({"sensor": values["sensor"], "temperature": values["temp"], "humidity": values["humid"]})
+            except (IndexError, ValueError):
+                pass
+        return sensors
+    
+    def serwrite(self, cmd):
+        return self.ser.write(cmd.encode("utf-8"))
+
+    def serread(self):
+        r = self.ser.read_until(self.CR)
+        return r.decode("utf-8").strip("\r\n") 
+    
+    def sanitize(self, readout):
+        tmp = readout.split(" ")
+        return {"sensor": int(tmp[0]), "temp": float(tmp[1]), "humid": float(tmp[2])}
 
 
 def check_args(args):
@@ -262,41 +371,55 @@ if __name__ == "__main__":
                 2: {"uid": "0120211005135902", "comment": "mux_4kg_2", "number_of_scales": 8},
                 3: {"uid": "0020240425142741", "comment": "mux_8kg_1", "number_of_scales": 4},}
 
-    parser = argparse.ArgumentParser(description="Process some options.")
+    # parser = argparse.ArgumentParser(description="Process some options.")
 
-    ## select where the script will show/save it"s data
-    group_save = parser.add_mutually_exclusive_group(required=False)
-    group_save.add_argument("-i", "--influx", action="store_true", help="Write data to InfluxDB")
-    group_save.add_argument("-c", "--csv", action="store_true", help="Write data to CSV")
-    group_save.add_argument("-v", "--verbose", action="store_true", help="Output values to terminal")
+    # ## select where the script will show/save it"s data
+    # group_save = parser.add_mutually_exclusive_group(required=False)
+    # group_save.add_argument("-i", "--influx", action="store_true", help="Write data to InfluxDB")
+    # group_save.add_argument("-c", "--csv", action="store_true", help="Write data to CSV")
+    # group_save.add_argument("-v", "--verbose", action="store_true", help="Output values to terminal")
 
-    parser.add_argument("-n", "--measurements", type=int, help="Quit after n measurements, set 0 for continuos measurement")
-    parser.add_argument("-g", "--granularity", type=int, help="granularity - seconds between measurements")
-    parser.add_argument("-z", "--zero", action="store_true", help="Zero all scales")
-    parser.add_argument("-u", "--usb", type=str, help="Define USB in Linux device name (e.g., ttyUSB0)")
-    parser.add_argument("-m", "--mux", type=int, choices=mux_dict.keys(), help=f"Choose mux. Options are {mux_dict.keys()}")
+    # parser.add_argument("-n", "--measurements", type=int, help="Quit after n measurements, set 0 for continuos measurement")
+    # parser.add_argument("-g", "--granularity", type=int, help="granularity - seconds between measurements")
+    # parser.add_argument("-z", "--zero", action="store_true", help="Zero all scales")
+    # parser.add_argument("-u", "--usb", type=str, help="Define USB in Linux device name (e.g., ttyUSB0)")
+    # parser.add_argument("-m", "--mux", type=int, choices=mux_dict.keys(), help=f"Choose mux. Options are {mux_dict.keys()}")
 
-    args = parser.parse_args()
+    # args = parser.parse_args()
 
-    usb_port, mux, output_method, measurements, granularity, zero = check_args(args)
-    con = Mux(device=usb_port, uid=mux_dict[args.mux]["uid"], number_of_scales=mux_dict[args.mux]["number_of_scales"], max_values=measurements, sleep_time=granularity)
+    # usb_port, mux, output_method, measurements, granularity, zero = check_args(args)
+    # con = Mux(device=usb_port, uid=mux_dict[args.mux]["uid"], number_of_scales=mux_dict[args.mux]["number_of_scales"], max_values=measurements, sleep_time=granularity)
 
 
-    if not (rev := con.get_revision()):
-        print("cannot take measurements - please check power supply and provided USB adapter settings, check cable integrity")
-        exit()
-    else:
-        print("scale revision:", rev)
+    # if not (rev := con.get_revision()):
+    #     print("cannot take measurements - please check power supply and provided USB adapter settings, check cable integrity")
+    #     exit()
+    # else:
+    #     print("scale revision:", rev)
 
-    if zero == True:
-        con.zero_all_scales()
-        print("done!")
-        exit()
+    # if zero == True:
+    #     con.zero_all_scales()
+    #     print("done!")
+    #     exit()
     
-    if output_method == "influx":
-        con.to_influx(client=client)
-    elif output_method == "csv":
-        con.to_csv()
-    else:
-        con.to_terminal()
-    print("\n we are done!")
+    # if output_method == "influx":
+    #     m = Measurement(device_temp_usb="ttyUSB0", 
+    #                     device_scale="ttyUSB1", 
+    #                     scale_uid=mux_dict[args.mux]["uid"], 
+    #                     number_of_scales=1, 
+    #                     measurements=10, 
+    #                     sleep_time=3, 
+    #                     client=client)
+    # elif output_method == "csv":
+    #     con.to_csv()
+    # else:
+    #     con.to_terminal()
+    # print("\n we are done!")
+
+    m = Measurement(device_temp_usb="ttyUSB0", 
+                    device_scale_usb="ttyUSB1", 
+                    scale_uid="0020240425142741", 
+                    number_of_scales=1, 
+                    measurements=10, 
+                    sleep_time=3, 
+                    client=client).to_influx()
