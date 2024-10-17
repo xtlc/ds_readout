@@ -6,7 +6,7 @@ class Flow:
     def __init__(self, FLOW_SENSOR_GPIO=13):
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(FLOW_SENSOR_GPIO, GPIO.IN, pull_up_down = GPIO.PUD_UP)
-        self.gpio
+        self.gpio = FLOW_SENSOR_GPIO
         self.count = 0
 
     def countPulse(self, channel):
