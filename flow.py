@@ -18,11 +18,11 @@ class Flow:
         GPIO.add_event_detect(self.gpio1, GPIO.FALLING, callback=self.countPulse1)
         GPIO.add_event_detect(self.gpio2, GPIO.FALLING, callback=self.countPulse2)
 
-    def countPulse1(self):
+    def countPulse1(self, channel):
         if self.start_counter_1 == 1:
             self.count1 += 1
 
-    def countPulse2(self):
+    def countPulse2(self, channel):
         if self.start_counter_2 == 1:
             self.count2 += 1
 
@@ -43,14 +43,14 @@ class Flow:
             self.count1 = 0
             self.count2 = 0
             
-            time.sleep(2)
+            
 
 # Create an instance of the Flow class and start monitoring
 flow_monitor = Flow()
 for i in range(1, 11):
-    print("round ", i)
-    flow_monitor.get_flow()        
-
+    flow_monitor.get_flow() 
+    print("round ", i, "done")
+    time.sleep(2)       
 
 class Flow_:
     def __init__(self, FLOW_SENSOR_GPIO=13):
@@ -75,4 +75,4 @@ class Flow_:
             time.sleep(5)
 
 
-print(Flow().get_flow())
+#print(Flow().get_flow())
