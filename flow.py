@@ -1,8 +1,55 @@
 import time
 import RPi.GPIO as GPIO
 
-
 class Flow:
+    def __init__(self, FLOW_SENSOR_GPIO_1=13, FLOW_SENSOR_GPIO_2=12):
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(FLOW_SENSOR_GPIO_1, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(FLOW_SENSOR_GPIO_2, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        
+        self.gpio1 = FLOW_SENSOR_GPIO_1
+        self.gpio2 = FLOW_SENSOR_GPIO_2
+        self.count1 = 0
+        self.count2 = 0
+        self.start_counter = 0
+
+        # Add event detection for both GPIO pins
+        GPIO.add_event_detect(self.gpio1, GPIO.FALLING, callback=self.countPulse1)
+        GPIO.add_event_detect(self.gpio2, GPIO.FALLING, callback=self.countPulse2)
+
+    def countPulse1(self):
+        if self.start_counter == 1:
+            self.count1 += 1
+
+    def countPulse2(self):
+        if self.start_counter == 1:
+            self.count2 += 1
+
+    def get_flow(self):
+            self.start_counter = 1
+            time.sleep(1)
+            self.start_counter = 0
+            
+            flow1 = (self.count1 / 23)  # Adjust the divisor as needed
+            flow2 = (self.count2 / 23)  # Adjust the divisor as needed
+            
+            print("Flow Sensor 1: %.3f Liter/min" % flow1)
+            print("Flow Sensor 2: %.3f Liter/min" % flow2)
+            
+            # Reset counts for the next interval
+            self.count1 = 0
+            self.count2 = 0
+            
+            time.sleep(5)
+
+# Create an instance of the Flow class and start monitoring
+flow_monitor = Flow()
+for i in range(1, 11):
+    print("round ", i)
+    flow_monitor.get_flow()        
+
+
+class Flow_:
     def __init__(self, FLOW_SENSOR_GPIO=13):
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(FLOW_SENSOR_GPIO, GPIO.IN, pull_up_down = GPIO.PUD_UP)

@@ -1,3 +1,4 @@
 pyserial == 3.5
-influxdb3-python
+influxdb_client == 1.46.0
 environs
+requests ~= 2.32.3
