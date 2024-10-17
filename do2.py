@@ -1,10 +1,11 @@
 from serial import Serial, EIGHTBITS, STOPBITS_ONE, PARITY_NONE
-import time, csv, re, argparse, os
+import time, csv, re, argparse
 from environs import Env
-from influxdb_client_3 import InfluxDBClient3, Point
+import influxdb_client
+from influxdb_client.client.write_api import SYNCHRONOUS
+#from influxdb_client_3 import InfluxDBClient3, Point
 from datetime import datetime, timezone
-import RPi.GPIO as GPIO
-
+import os
 
 # Initialize the environment
 env = Env()
@@ -18,8 +19,7 @@ org = "abaton_influx"
 host = "https://eu-central-1-1.aws.cloud2.influxdata.com"
 bucket = env("BUCKET")
 
-client = InfluxDBClient3(host=host, database=bucket, token=token, org=org)
-
+client = influxdb_client.InfluxDBClient(url=host, token=token, org=org)
 
 class Mux:
     """
@@ -34,6 +34,9 @@ class Mux:
         self.COUNTER = 0
         self.MAX_VALUES = max_values
         self.SLEEP = sleep_time
+        #print(self.zero_all_scales())
+        #print("all scales were zeroed ...")
+
 
     def create_port(self, ):
         if os.name == "nt":
@@ -107,8 +110,8 @@ class Mux:
         
         if self.MAX_VALUES != 0: ## if it is 0 continuos polling
             self.COUNTER += 1
-        if self.COUNTER == self.MAX_VALUES:
-            exit()
+            if self.COUNTER == self.MAX_VALUES:
+                exit()
         self.muxwrite(cmd="gl", pre="#")
         r = self.muxread()
         values = self.sanitize(mux_readout=r)
@@ -154,7 +157,7 @@ class Mux:
                 if idx < 4:
                     t.append(f"""{BOLD}{RED}{key}:{RESET} {float(scale_values[key]):06.3f}kg""")
                 else:
-                    t.append(f"""{BOLD}{CYAN}{key}:{RESET} {float(scale_values[key]):06.2f}°C""")
+                    t.append(f"""{BOLD}{CYAN}{key}:{RESET} {float(scale_values[key]):06.2f}Â°C""")
             scale_string = "  |  ".join(t)
         else:
             print("just printing the output:", scale_values)
@@ -166,7 +169,7 @@ class Mux:
             return
 
 class Measurement:
-    def __init__(self, device_temp_usb=None, device_scale_usb=None, scale_uid=None, number_of_scales=0, measurements=0, sleep_time=60, client=None):
+    def __init__(self, device_temp_usb=None, device_scale_usb=None, scale_uid=None, number_of_scales=0, measurements=0, sleep_time=60, client=None, bucket=None, org=None):
         if device_scale_usb:
             self.scales = Mux(device=device_scale_usb, uid=scale_uid, number_of_scales=number_of_scales, max_values=measurements, sleep_time=sleep_time)
             self.number_of_scales = number_of_scales
@@ -174,70 +177,40 @@ class Measurement:
             self.temps = Temp(device=device_temp_usb)
         if client:
             self.client = client
+            self.org = org
+            self.bucket = bucket
         self.wait_time = sleep_time ## seconds
 
-    def to_csv(self):
-        csv_file_name = f"""log_from_{datetime.now().strftime("%Y-%m-%d___%H-%M-%S")}.csv"""
-        with open(csv_file_name, mode="w", newline="") as csvfile:
-            w = self.scales.get_all_weights()
-            t = self.temps.get_all_temps()
-            scales = ["mux", "timestamp", *[f"scale_{i:02}" for i in range(self.SCALES)]]
-            temps = self.temps
-
-    # def to_csv(self):
-    #     csv_file_name = f"""log_from_{datetime.now().strftime("%Y-%m-%d___%H-%M-%S")}.csv"""
-        
-    #     print(f"""csv file {csv_file_name} is being written ...\n""")
-    #     with open(csv_file_name, mode="w", newline="") as csvfile:
-    #         fieldnames = ["mux", "timestamp", *[f"scale_{i:02}" for i in range(self.SCALES)]]
-    #         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=";")
-    #         writer.writeheader()
-    #         while True:
-    #             now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    #             w = self.get_all_weights()
-    #             datarow = {"mux": self.UID, "timestamp": now,  **{f"scale_{i:02}": w[f"{i:02}"] for i in range(self.SCALES)}}
-    #             writer.writerow(datarow)
-    #             self.view_output(scale_values=w)
 
     def to_influx(self, db_name="teststand_1"):
+        write_to_influx = self.client.write_api(write_options=SYNCHRONOUS)
         while True:
+            now = datetime.utcnow().replace(microsecond=0)
+
             w = self.scales.get_all_weights()
             t = self.temps.get_all_temps()
-            time.sleep(self.wait_time)
-            #for scale, weight in w.items():
-            #    p = Point(db_name).field(f"scale_{scale}", float(weight) * 1000).time(datetime.utcnow())
-            #    client.write(record=p)
 
             if self.number_of_scales == 1:
-                now = datetime.utcnow()
-                ## add mux id here?
-                p_01 = Point(db_name).field(f"scale_1", float(w["00"]) * 1000, ).time(now)
-                client.write(record=p_01)
-                p_02 = Point(db_name).field(f"temp_left_bot",  float(t[0]["temperature"])).time(now)
-                client.write(record=p_02)
-                p_03 = Point(db_name).field(f"humid_left_bot", float(t[0]["humidity"])).time(now)
-                client.write(record=p_03)
-                p_04 = Point(db_name).field(f"temp_left_top",  float(t[1]["temperature"])).time(now)
-                client.write(record=p_04)
-                p_05 = Point(db_name).field(f"humid_left_top", float(t[1]["humidity"])).time(now)
-                client.write(record=p_05)
-                p_06 = Point(db_name).field(f"temp_mid_bot",  float(t[2]["temperature"])).time(now)
-                client.write(record=p_06)
-                p_07 = Point(db_name).field(f"humid_mid_bot", float(t[2]["humidity"])).time(now)
-                client.write(record=p_07)
-                p_08 = Point(db_name).field(f"temp_mid_top", float(t[3]["temperature"])).time(now)
-                client.write(record=p_08)
-                p_09 = Point(db_name).field(f"humi_mid_top",  float(t[3]["humidity"])).time(now)
-                client.write(record=p_09)
-                p_10 = Point(db_name).field(f"temp_right_bot", float(t[4]["temperature"])).time(now)
-                client.write(record=p_10)
-                p_11 = Point(db_name).field(f"humid_right_bot", float(t[4]["humidity"])).time(now)
-                client.write(record=p_11)
-                p_12 = Point(db_name).field(f"temp_right_top", float(t[5]["temperature"])).time(now)
-                client.write(record=p_12)
-                p_13 = Point(db_name).field(f"humid_right_top", float(t[5]["humidity"])).time(now)
-                client.write(record=p_13)
-                print("points written to influx: ", now)
+                print("we cannot do this for now")
+                
+            elif self.number_of_scales == 2:
+                p_01 = influxdb_client.Point(db_name).field(f"scale_left", float(w["00"]) * 1000, ).time(now)
+                p_02 = influxdb_client.Point(db_name).field(f"scale_right", float(w["01"]) * 1000, ).time(now)
+                p_03 = influxdb_client.Point(db_name).field(f"temp_left_bot",  float(t[0]["temperature"])).time(now)
+                p_04 = influxdb_client.Point(db_name).field(f"humid_left_bot", float(t[0]["humidity"])).time(now)
+                p_05 = influxdb_client.Point(db_name).field(f"temp_left_top",  float(t[1]["temperature"])).time(now)
+                p_06 = influxdb_client.Point(db_name).field(f"humid_left_top", float(t[1]["humidity"])).time(now)
+                p_07 = influxdb_client.Point(db_name).field(f"temp_mid_bot",  float(t[2]["temperature"])).time(now)
+                p_08 = influxdb_client.Point(db_name).field(f"humid_mid_bot", float(t[2]["humidity"])).time(now)
+                p_09 = influxdb_client.Point(db_name).field(f"temp_mid_top", float(t[3]["temperature"])).time(now)
+                p_10 = influxdb_client.Point(db_name).field(f"humid_mid_top",  float(t[3]["humidity"])).time(now)
+                p_11 = influxdb_client.Point(db_name).field(f"temp_right_bot", float(t[4]["temperature"])).time(now)
+                p_12 = influxdb_client.Point(db_name).field(f"humid_right_bot", float(t[4]["humidity"])).time(now)
+                p_13 = influxdb_client.Point(db_name).field(f"temp_right_top", float(t[5]["temperature"])).time(now)
+                p_14 = influxdb_client.Point(db_name).field(f"humid_right_top", float(t[5]["humidity"])).time(now)
+                write_to_influx.write(bucket=self.bucket, record=[p_01, p_02, p_03, p_04, p_05, p_06, p_07, p_08, p_09, p_10, p_11, p_12, p_13, p_14])
+            time.sleep(self.wait_time)
+            print("points written to influx: ", now)
 
     def to_terminal(self):
         while True:
@@ -292,31 +265,6 @@ class Temp:
     def sanitize(self, readout):
         tmp = readout.split(" ")
         return {"sensor": int(tmp[0]), "temp": float(tmp[1]), "humid": float(tmp[2])}
-
-
-class Flow:
-    def __init__(self, FLOW_SENSOR_GPIO=13):
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(FLOW_SENSOR_GPIO, GPIO.IN, pull_up_down = GPIO.PUD_UP)
-        self.gpio
-        self.count = 0
-
-    def countPulse(self, channel):
-        if self.start_counter == 1:
-            self.count = self.count+1
-
-    def get_flow(self):
-        GPIO.add_event_detect(self.gpio, GPIO.FALLING, callback=self.countPulse)
-        while True:
-            self.start_counter = 1
-            time.sleep(1)
-            self.start_counter = 0
-            flow = (self.count/23)
-            print("The flow is: %.3f Liter/min" % (flow))
-            self.count = 0
-            time.sleep(5)
-
-
 
 
 def check_args(args):
@@ -453,7 +401,9 @@ if __name__ == "__main__":
     m = Measurement(device_temp_usb="ttyUSB0", 
                     device_scale_usb="ttyUSB1", 
                     scale_uid="0020240425142741", 
-                    number_of_scales=1, 
-                    measurements=10, 
-                    sleep_time=3, 
-                    client=client).to_influx()
+                    number_of_scales=2, 
+                    measurements=0, 
+                    sleep_time=10, 
+                    client=client,
+                    org=org,
+                    bucket=bucket).to_influx()
