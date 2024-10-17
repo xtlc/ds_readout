@@ -24,7 +24,7 @@ client = InfluxDBClient(url=host, token=token, org=org)
 class Measurement:
     def __init__(self, 
                  device_temp_usb=None,
-                 device_flow_GPIO=None, 
+                 device_flow_GPIOs=None, 
                  device_scale_usb=None, 
                  scale_uid=None, 
                  number_of_scales=0, 
@@ -38,8 +38,9 @@ class Measurement:
             self.number_of_scales = number_of_scales
         if device_temp_usb:
             self.temps = Temp(device=device_temp_usb)
-        if device_flow_GPIO:
-            self.flow = Flow(gpio=device_flow_GPIO)
+        if device_flow_GPIOs:
+            if len(device_flow_GPIOs) == 2:
+                self.flow = Flow(gpio=device_flow_GPIOs[0], gpio=device_flow_GPIOs[1],)
         if client:
             self.client = client
             self.org = org
@@ -54,6 +55,7 @@ class Measurement:
 
             w = self.scales.get_all_weights()
             t = self.temps.get_all_temps()
+            f = self.flow.get_flow()
 
             if self.number_of_scales == 1:
                 print("we cannot do this for now")
@@ -73,7 +75,9 @@ class Measurement:
                 p_12 = Point(db_name).field(f"humid_right_bot", float(t[4]["humidity"])             ).time(now)
                 p_13 = Point(db_name).field(f"temp_right_top",  float(t[5]["temperature"])          ).time(now)
                 p_14 = Point(db_name).field(f"humid_right_top", float(t[5]["humidity"])             ).time(now)
-                write_to_influx.write(bucket=self.bucket, record=[p_01, p_02, p_03, p_04, p_05, p_06, p_07, p_08, p_09, p_10, p_11, p_12, p_13, p_14])
+                p_15 = Point(db_name).field(f"flow_left",       float(f["flow_left"])               ).time(now)
+                p_16 = Point(db_name).field(f"flow_right",      float(f["flow_right"])              ).time(now)
+                write_to_influx.write(bucket=self.bucket, record=[p_01, p_02, p_03, p_04, p_05, p_06, p_07, p_08, p_09, p_10, p_11, p_12, p_13, p_14, p_15, p_16])
             time.sleep(self.wait_time)
             print("points written to influx: ", now)
 
