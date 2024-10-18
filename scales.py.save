@@ -15,7 +15,7 @@ class Mux:
         self.COUNTER = 0
         self.MAX_VALUES = max_values
         self.SLEEP = sleep_time
-        #self.zero_all_scales()
+	self.
 
     def create_port(self, ):
         if os.name == "nt":
@@ -38,7 +38,6 @@ class Mux:
                               xonxoff=False, 
                               rtscts=False, 
                               dsrdtr=False)
-        print("scales port was initiated ...")
 
     @staticmethod
     def calculate_crc(data):
@@ -90,9 +89,8 @@ class Mux:
         
         if self.MAX_VALUES != 0: ## if it is 0 continuos polling
             self.COUNTER += 1
-            if self.COUNTER == self.MAX_VALUES:
-                print("counter ran out ...")
-                exit()
+        if self.COUNTER == self.MAX_VALUES:
+            exit()
         self.muxwrite(cmd="gl", pre="#")
         r = self.muxread()
         values = self.sanitize(mux_readout=r)

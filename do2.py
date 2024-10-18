@@ -1,6 +1,6 @@
 import time
 from environs import Env
-import influxdb_client import InfluxDBClient, Point 
+from influxdb_client import InfluxDBClient, Point 
 from influxdb_client.client.write_api import SYNCHRONOUS
 from datetime import datetime
 from scales import Mux
@@ -39,8 +39,7 @@ class Measurement:
         if device_temp_usb:
             self.temps = Temp(device=device_temp_usb)
         if device_flow_GPIOs:
-            if len(device_flow_GPIOs) == 2:
-                self.flow = Flow(gpio=device_flow_GPIOs[0], gpio=device_flow_GPIOs[1],)
+            self.flow = Flow(FLOW_SENSOR_GPIO_1=device_flow_GPIOs[0], FLOW_SENSOR_GPIO_2=device_flow_GPIOs[1],)
         if client:
             self.client = client
             self.org = org
@@ -49,7 +48,9 @@ class Measurement:
 
 
     def to_influx(self, db_name="teststand_1"):
+        print("start writing to influx ...")
         write_to_influx = self.client.write_api(write_options=SYNCHRONOUS)
+        print("client created ...")
         while True:
             now = datetime.utcnow().replace(microsecond=0)
 
@@ -78,6 +79,8 @@ class Measurement:
                 p_15 = Point(db_name).field(f"flow_left",       float(f["flow_left"])               ).time(now)
                 p_16 = Point(db_name).field(f"flow_right",      float(f["flow_right"])              ).time(now)
                 write_to_influx.write(bucket=self.bucket, record=[p_01, p_02, p_03, p_04, p_05, p_06, p_07, p_08, p_09, p_10, p_11, p_12, p_13, p_14, p_15, p_16])
+            else:
+                print(f"number of scales not supported: {self.number_of_scales}")
             time.sleep(self.wait_time)
             print("points written to influx: ", now)
 
@@ -97,6 +100,7 @@ if __name__ == "__main__":
     m = Measurement(device_temp_usb="ttyUSB0", 
                     device_scale_usb="ttyUSB1", 
                     scale_uid="0020240425142741", 
+                    device_flow_GPIOs=[12, 13],
                     number_of_scales=2, 
                     measurements=0, 
                     sleep_time=10, 

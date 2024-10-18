@@ -17,6 +17,7 @@ class Flow:
         # Add event detection for both GPIO pins
         GPIO.add_event_detect(self.gpio1, GPIO.FALLING, callback=self.countPulse1)
         GPIO.add_event_detect(self.gpio2, GPIO.FALLING, callback=self.countPulse2)
+        print("flow sensors initiated ...")
 
     def countPulse1(self, channel):
         if self.start_counter_1 == 1:

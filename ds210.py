@@ -1,5 +1,5 @@
 from serial import Serial, EIGHTBITS, STOPBITS_ONE, PARITY_NONE
-import os, time, 
+import os, time 
 
 class Temp:
     def __init__(self, device, ):
@@ -7,7 +7,7 @@ class Temp:
         self.create_port()
         self.CR = "\x0D"
         self.sensors = self.get_all_temps()
-        print("available temp sensors:", self.sensors)
+        # print("available temp sensors:", self.sensors)
     
     def create_port(self, ):
         if os.name == "nt":
