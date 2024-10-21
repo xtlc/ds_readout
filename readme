@@ -4,3 +4,6 @@ Link on Amazon: https://www.amazon.de/dp/B07XZ3PV8T/ref=sspa_dk_detail_0?psc=1&p
 Connect the GND of the connector and the PSU to one line (must be connected) - see PPTX for installation details.
 
 mux is the name of the multiplexer, it can be read on the back of the scale boards (or take the UID of a scale and skip the last two digits). This is only valid for the e-nventory boards!
+
+
+sudo apt install fswebcam

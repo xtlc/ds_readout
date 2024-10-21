@@ -6,6 +6,7 @@ from datetime import datetime
 from scales import Mux
 from ds210 import Temp
 from flow import Flow
+from cam import Cam
 
 # Initialize the environment
 env = Env()
