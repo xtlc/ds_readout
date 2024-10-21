@@ -1,4 +1,6 @@
 pyserial == 3.5
 influxdb_client == 1.46.0
-environs
+environs==11.0.0
 requests ~= 2.32.3
+lgpio==0.2.2.0
+pyserial==3.5
