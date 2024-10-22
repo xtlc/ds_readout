@@ -33,6 +33,7 @@ class Measurement:
                  sleep_time=60, 
                  client=None, 
                  bucket=None, 
+                 cam=False,
                  org=None):
         if device_scale_usb:
             self.scales = Mux(device=device_scale_usb, uid=scale_uid, number_of_scales=number_of_scales, max_values=measurements, sleep_time=sleep_time)
@@ -41,6 +42,8 @@ class Measurement:
             self.temps = Temp(device=device_temp_usb)
         if device_flow_GPIOs:
             self.flow = Flow(FLOW_SENSOR_GPIO_1=device_flow_GPIOs[0], FLOW_SENSOR_GPIO_2=device_flow_GPIOs[1],)
+        if cam:
+            self.cam = Cam(resolution=[1920, 1080], filetype="jpeg")
         if client:
             self.client = client
             self.org = org
@@ -58,6 +61,8 @@ class Measurement:
             w = self.scales.get_all_weights()
             t = self.temps.get_all_temps()
             f = self.flow.get_flow()
+            c = self.cam.shoot(filename=now.strftime("%Y_%m_%d__%H_%M_%S"))
+
 
             if self.number_of_scales == 1:
                 print("we cannot do this for now")
