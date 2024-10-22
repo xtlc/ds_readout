@@ -110,6 +110,7 @@ if __name__ == "__main__":
                     scale_uid="0020240425142741", 
                     device_flow_GPIOs=[12, 13],
                     number_of_scales=2, 
+                    cam=True,
                     measurements=0, 
                     sleep_time=10, 
                     client=client,
