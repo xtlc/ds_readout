@@ -54,7 +54,6 @@ class Measurement:
     def to_influx(self, db_name="teststand_1"):
         print("start writing to influx ...")
         write_to_influx = self.client.write_api(write_options=SYNCHRONOUS)
-        print("client created ...")
         while True:
             now = datetime.utcnow().replace(microsecond=0)
 
