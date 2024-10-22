@@ -89,8 +89,10 @@ class Measurement:
         while True:
             w = self.scales.get_all_weights()
             t = self.temps.get_all_temps()
+            f = self.flow.get_flow()
             print("---> w -->", w)
             print("---> t -->", t)
+            print("---> f -->", f)
             time.sleep(self.wait_time)
     
 if __name__ == "__main__":
