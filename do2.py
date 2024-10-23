@@ -98,13 +98,16 @@ class Measurement:
                 out = ""
                 if hasattr(self, "scales"): 
                     w = self.scales.get_all_weights()
-                    out += f"""{my_format(w["00"])} | {my_format(w["01"])} """
+                    out += f"""{my_format(w["00"])} | {my_format(w["01"])} | """
 
                 if hasattr(self, "temps"):
                     t = self.temps.get_all_temps()
+                    out += f"""{my_format(t[1]["temperature"])} | {my_format(t[0]["temperature"])} | {my_format(t[3]["temperature"])} | {my_format(t[2]["temperature"])} | {my_format(t[5]["temperature"])} | {my_format(t[4]["temperature"])} | """
+                    out += f"""{my_format(t[1]["humidity"])} | {my_format(t[0]["humidity"])} | {my_format(t[3]["humidity"])} | {my_format(t[2]["humidity"])} | {my_format(t[5]["humidity"])} | {my_format(t[4]["humidity"])} | """
 
                 if hasattr(self, "flow"):
                     f = self.flow.get_flow()
+                    out += f"""{my_format(f["flow_left"])} | {my_format(f["flow_right"])} | """
 
                 print(out)
                 time.sleep(self.wait_time)
