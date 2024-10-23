@@ -84,11 +84,12 @@ class Measurement:
             time.sleep(self.wait_time)
 
     def to_terminal(self, w=None, f=None, t=None):
-
         def my_format(v):
             total_width = 10
             if isinstance(v, str):
                 x = v.lstrip("0")
+                if x.startswith("."):
+                    x = f"0{x}"
                 leading_spaces = total_width - len(x)
                 formatted_value = " " * leading_spaces + x
             else:
