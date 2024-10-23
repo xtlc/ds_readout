@@ -45,8 +45,8 @@ class Flow:
         flow_right = (self.count_right / 23)  # Adjust the divisor as needed
         flow_left = (self.count_left / 23)  # Adjust the divisor as needed
         
-        print("Flow Sensor 1: %.3f Liter/min" % flow_right)
-        print("Flow Sensor 2: %.3f Liter/min" % flow_left)
+        # print("Flow Sensor 1: %.3f Liter/min" % flow_right)
+        # print("Flow Sensor 2: %.3f Liter/min" % flow_left)
         
         # Reset counts for the next interval
         self.count_right = 0
