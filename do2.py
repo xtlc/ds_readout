@@ -56,7 +56,8 @@ class Measurement:
             w = self.scales.get_all_weights()
             t = self.temps.get_all_temps()
             f = self.flow.get_flow()
-            c = self.cam.shoot(filename=now.strftime("%Y_%m_%d__%H_%M_%S"))
+            if self.cam:
+                self.cam.shoot(filename=now.strftime("%Y_%m_%d__%H_%M_%S"))
 
             if self.number_of_scales  == 2:
                 p_01 = Point(db_name).field(f"scale_left",      float(w["00"])              * 1000, ).time(now)
@@ -82,15 +83,24 @@ class Measurement:
             print("points written to influx: ", now)
 
     def to_terminal(self):
-        while True:
-            w = self.scales.get_all_weights()
-            t = self.temps.get_all_temps()
-            f = self.flow.get_flow()
-            print("---> w -->", w)
-            print("---> t -->", t)
-            print("---> f -->", f)
-            time.sleep(self.wait_time)
-    
+        if self.number_of_scales == 2:
+            head = "scale_left | scale_right | t_left_top | t_left_bot | t_mid_top | t_mid_bot | t_right_top | t_right_bot | h_left_top | h_left_bot | h_mid_top | h_mid_bot | h_right_top | h_right_bot | flow_left | flow_right "
+            print(head)
+            while True:
+                out = ""
+                if hasattr(self, "scales"): 
+                    w = self.scales.get_all_weights()
+                    out += f"""{w["00"]} | {w["01"]}"""
+
+                if hasattr(self, "temps"):
+                    t = self.temps.get_all_temps()
+
+                if hasattr(self, "flow"):
+                    f = self.flow.get_flow()
+
+                print(out)
+                time.sleep(self.wait_time)
+        
 if __name__ == "__main__":
     mux_dict = {1: {"uid": "0120211005135155", "comment": "mux_4kg_1", "number_of_scales": 8}, 
                 2: {"uid": "0120211005135902", "comment": "mux_4kg_2", "number_of_scales": 8},
