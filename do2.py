@@ -105,9 +105,8 @@ class Measurement:
 
                 if hasattr(self, "temps"):
                     t = self.temps.get_all_temps()
-                    print(t, "<---")
-                    #out += f"""{my_format(t[1]["temperature"])} | {my_format(t[0]["temperature"])} | {my_format(t[3]["temperature"])} | {my_format(t[2]["temperature"])} | {my_format(t[5]["temperature"])} | {my_format(t[4]["temperature"])} | """
-                    #out += f"""{my_format(t[1]["humidity"])} | {my_format(t[0]["humidity"])} | {my_format(t[3]["humidity"])} | {my_format(t[2]["humidity"])} | {my_format(t[5]["humidity"])} | {my_format(t[4]["humidity"])} | """
+                    out += f"""{my_format(t[1]["temperature"])} | {my_format(t[0]["temperature"])} | {my_format(t[3]["temperature"])} | {my_format(t[2]["temperature"])} | {my_format(t[5]["temperature"])} | {my_format(t[4]["temperature"])} | """
+                    out += f"""{my_format(t[1]["humidity"])} | {my_format(t[0]["humidity"])} | {my_format(t[3]["humidity"])} | {my_format(t[2]["humidity"])} | {my_format(t[5]["humidity"])} | {my_format(t[4]["humidity"])} | """
 
                 if hasattr(self, "flow"):
                     f = self.flow.get_flow()
