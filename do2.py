@@ -90,7 +90,7 @@ class Measurement:
                 out = ""
                 if hasattr(self, "scales"): 
                     w = self.scales.get_all_weights()
-                    out += f"""{w["00"]} | {w["01"]}"""
+                    out += f"""{w["00"]:>10.3f} | {w["01"]:>10.3f}"""
 
                 if hasattr(self, "temps"):
                     t = self.temps.get_all_temps()
