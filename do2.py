@@ -56,7 +56,7 @@ class Measurement:
             w = self.scales.get_all_weights()
             t = self.temps.get_all_temps()
             f = self.flow.get_flow()
-            if self.cam:
+            if hasattr(self, "cam"):
                 self.cam.shoot(filename=now.strftime("%Y_%m_%d__%H_%M_%S"))
 
             if self.number_of_scales  == 2:
@@ -141,6 +141,6 @@ if __name__ == "__main__":
                     token=token,
                     bucket=bucket,
                     org=org,
-                    cam=False)
+                    cam=True)
     #m.to_terminal()
     m.to_influx()
