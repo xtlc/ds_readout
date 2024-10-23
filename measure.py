@@ -1,5 +1,4 @@
 import time
-from environs import Env
 from influxdb_client import InfluxDBClient, Point 
 from influxdb_client.client.write_api import SYNCHRONOUS
 from datetime import datetime
@@ -8,17 +7,6 @@ from ds210 import Temp
 from flow import Flow
 from cam import Cam
 import colorama
-from colorama import Fore, Style
-
-# Initialize the environment & read env file
-env = Env()
-env.read_env()
-
-# InfluxDB parameters
-token = env("INFLUX_TOKEN")
-org = "abaton_influx"
-host = "https://eu-central-1-1.aws.cloud2.influxdata.com"
-bucket = env("BUCKET")
 
 class Measurement:
     def __init__(self, 
@@ -130,23 +118,3 @@ class Measurement:
                 print(out)
                 counter += 1
                 time.sleep(self.wait_time)
-        
-if __name__ == "__main__":
-    mux_dict = {1: {"uid": "0120211005135155", "comment": "mux_4kg_1", "number_of_scales": 8}, 
-                2: {"uid": "0120211005135902", "comment": "mux_4kg_2", "number_of_scales": 8},
-                3: {"uid": "0020240425142741", "comment": "mux_8kg_1", "number_of_scales": 4},}
-
-    m = Measurement(device_temp_usb="ttyUSB0", 
-                    device_scale_usb="ttyUSB1", 
-                    scale_uid="0020240425142741", 
-                    device_flow_GPIOs=[12, 13],
-                    number_of_scales=2, 
-                    measurements=0, 
-                    sleep_time=10, 
-                    host=host,
-                    token=token,
-                    bucket=bucket,
-                    org=org,
-                    cam=False)
-    #m.to_terminal()
-    m.to_influx()
