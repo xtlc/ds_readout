@@ -38,7 +38,7 @@ class Measurement:
         if device_temp_usb:
             self.temps = Temp(device=device_temp_usb)
         if device_flow_GPIOs:
-            self.flow = Flow(FLOW_SENSOR_GPIO_1=device_flow_GPIOs[0], FLOW_SENSOR_GPIO_2=device_flow_GPIOs[1],)
+            self.flow = Flow(FLOW_SENSOR_GPIO_RIGHT=device_flow_GPIOs[0], FLOW_SENSOR_GPIO_LEFT=device_flow_GPIOs[1],)
         if cam:
             self.cam = Cam(resolution=[1920, 1080], filetype="jpeg")
         if host:
@@ -105,8 +105,6 @@ if __name__ == "__main__":
     mux_dict = {1: {"uid": "0120211005135155", "comment": "mux_4kg_1", "number_of_scales": 8}, 
                 2: {"uid": "0120211005135902", "comment": "mux_4kg_2", "number_of_scales": 8},
                 3: {"uid": "0020240425142741", "comment": "mux_8kg_1", "number_of_scales": 4},}
-
-
 
     m = Measurement(device_temp_usb="ttyUSB0", 
                     device_scale_usb="ttyUSB1", 
