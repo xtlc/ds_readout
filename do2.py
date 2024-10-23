@@ -7,6 +7,8 @@ from scales import Mux
 from ds210 import Temp
 from flow import Flow
 from cam import Cam
+import colorama
+from colorama import Fore, Style
 
 # Initialize the environment & read env file
 env = Env()
@@ -45,6 +47,9 @@ class Measurement:
             self.client = InfluxDBClient(url=host, token=token, org=org)
             self.bucket = bucket
         self.wait_time = sleep_time ## seconds
+
+        # Initialize colorama
+        colorama.init()
 
 
     def to_influx(self, db_name="teststand_1"):
@@ -97,7 +102,8 @@ class Measurement:
             return f"""{formatted_value}"""
 
         if self.number_of_scales == 2:
-            head = "scale_left | scale_right | t_left_top | t_left_bot | t_mid_top  | t_mid_bot  | t_right_top | t_right_bot | h_left_top | h_left_bot | h_mid_top  | h_mid_bot | h_right_top | h_right_bot | flow_left | flow_right |\n"
+            head = "scale_left | scale_right | \033[31mt_left_top\033[39m | \033[31mt_left_bot\033[39m | \033[31mt_mid_top\033[39m  | \033[31mt_mid_bot\033[39m  | \033[31mt_right_top\033[39m | \033[31mt_right_bot\033[39m"
+            head += "| h_left_top | h_left_bot | h_mid_top  | h_mid_bot | h_right_top | h_right_bot | flow_left | flow_right |\n"
             head += "------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
             
             counter = 0
