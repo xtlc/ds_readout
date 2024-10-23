@@ -47,6 +47,7 @@ class Measurement:
     def to_influx(self, db_name="teststand_1"):
         print("start writing to influx ...")
         write_to_influx = self.client.write_api(write_options=SYNCHRONOUS)
+        counter = 0
         while True:
             now = datetime.utcnow().replace(microsecond=0)
 
@@ -77,7 +78,8 @@ class Measurement:
             else:
                 print(f"number of scales not supported: {self.number_of_scales}")
                 exit()
-            self.to_terminal(w=w, t=t, f=f)
+            self.print_to_terminal(counter=counter, w=w, t=t, f=f)
+            counter += 1
             time.sleep(self.wait_time)
 
     def print_to_terminal(self, counter=None, w=None, f=None, t=None):
