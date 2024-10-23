@@ -89,7 +89,7 @@ class Measurement:
             x = v.lstrip("0")
             leading_spaces = total_width - len(x)
             formatted_value = " " * leading_spaces + x
-            return f"""{formatted_value:>10.3f}"""
+            return f"""{formatted_value}"""
 
         if self.number_of_scales == 2:
             head = "scale_left | scale_right | t_left_top | t_left_bot | t_mid_top | t_mid_bot | t_right_top | t_right_bot | h_left_top | h_left_bot | h_mid_top | h_mid_bot | h_right_top | h_right_bot | flow_left | flow_right "
