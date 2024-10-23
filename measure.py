@@ -39,6 +39,10 @@ class Measurement:
         # Initialize colorama
         colorama.init()
 
+    
+
+
+
 
     def to_influx(self, db_name="teststand_1"):
         print("start writing to influx ...")
@@ -76,7 +80,7 @@ class Measurement:
             self.to_terminal(w=w, t=t, f=f)
             time.sleep(self.wait_time)
 
-    def to_terminal(self, w=None, f=None, t=None):
+    def print_to_terminal(self, counter=None, w=None, f=None, t=None):
         def my_format(v):
             total_width = 10
             if isinstance(v, str):
@@ -94,27 +98,34 @@ class Measurement:
             head += "| \033[36mh_left_top\033[39m | \033[36mh_left_bot\033[39m | \033[36mh_mid_top\033[39m  | \033[36mh_mid_bot\033[39m | \033[36mh_right_top\033[39m | \033[36mh_right_bot\033[39m | \033[35mflow_left\033[39m | \033[35mflow_right\033[39m |\n"
             head += "------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
             
-            counter = 0
-            while True:
-                if counter % 10 == 0:
-                    print(head)
-                out = ""
-                if hasattr(self, "scales"):
-                    if w == None: 
-                        w = self.scales.get_all_weights()
-                    out += f"""\033[33m{my_format(w["00"])}\033[39m |  \033[33m{my_format(w["01"])}\033[36m | """
+            if counter % 10 == 0:
+                print(head)
+            out = ""
+            out += f"""\033[33m{my_format(w["00"])}\033[39m |  \033[33m{my_format(w["01"])}\033[36m | """
 
-                if hasattr(self, "temps"):
-                    if t == None:
-                        t = self.temps.get_all_temps()
-                    out += f"""\033[31m{my_format(t[1]["temperature"])}\033[39m | \033[31m{my_format(t[0]["temperature"])}\033[39m | \033[31m{my_format(t[3]["temperature"])}\033[39m | \033[31m{my_format(t[2]["temperature"])}\033[39m |  \033[31m{my_format(t[5]["temperature"])}\033[39m |  \033[31m{my_format(t[4]["temperature"])}\033[39m | """
-                    out += f"""\033[36m{my_format(t[1]["humidity"])}\033[39m | \033[36m{my_format(t[0]["humidity"])}\033[39m | \033[36m{my_format(t[3]["humidity"])}\033[39m | \033[36m{my_format(t[2]["humidity"])}\033[39m | \033[36m{my_format(t[5]["humidity"])}\033[39m | \033[36m{my_format(t[4]["humidity"])}\033[39m | """
+            out += f"""\033[31m{my_format(t[1]["temperature"])}\033[39m | \033[31m{my_format(t[0]["temperature"])}\033[39m | \033[31m{my_format(t[3]["temperature"])}\033[39m | \033[31m{my_format(t[2]["temperature"])}\033[39m |  \033[31m{my_format(t[5]["temperature"])}\033[39m |  \033[31m{my_format(t[4]["temperature"])}\033[39m | """
+            out += f"""\033[36m{my_format(t[1]["humidity"])}\033[39m | \033[36m{my_format(t[0]["humidity"])}\033[39m | \033[36m{my_format(t[3]["humidity"])}\033[39m | \033[36m{my_format(t[2]["humidity"])}\033[39m | \033[36m{my_format(t[5]["humidity"])}\033[39m | \033[36m{my_format(t[4]["humidity"])}\033[39m | """
 
-                if hasattr(self, "flow"):
-                    if f == None:
-                        f = self.flow.get_flow()
-                    out += f"""\033[35m{my_format(f["flow_left"])}\033[39m | \033[35m{my_format(f["flow_right"])}\033[39m | """
+            out += f"""\033[35m{my_format(f["flow_left"])}\033[39m | \033[35m{my_format(f["flow_right"])}\033[39m | """
+            print(out)
 
-                print(out)
-                counter += 1
-                time.sleep(self.wait_time)
+
+    def to_terminal(self):
+        counter = 0
+        while True:
+            if hasattr(self, "scales"):
+                w = self.scales.get_all_weights()
+            else:
+                w = None
+            if hasattr(self, "temps"):
+                t = self.temps.get_all_temps()
+            else:
+                t = None
+            if hasattr(self, "flow"):
+                f = self.flow.get_flow()
+            else:
+                f = None
+
+            self.print_to_terminal(counter=counter, w=w, t=t, f=f)
+            counter += 1
+            time.sleep(self.wait_time)
