@@ -8,10 +8,8 @@ from ds210 import Temp
 from flow import Flow
 from cam import Cam
 
-# Initialize the environment
+# Initialize the environment & read env file
 env = Env()
-
-# Read the .env file
 env.read_env()
 
 # InfluxDB parameters
@@ -19,8 +17,6 @@ token = env("INFLUX_TOKEN")
 org = "abaton_influx"
 host = "https://eu-central-1-1.aws.cloud2.influxdata.com"
 bucket = env("BUCKET")
-
-client = InfluxDBClient(url=host, token=token, org=org)
 
 class Measurement:
     def __init__(self, 
@@ -31,7 +27,8 @@ class Measurement:
                  number_of_scales=0, 
                  measurements=0, 
                  sleep_time=60, 
-                 client=None, 
+                 host=None,
+                 token=None,
                  bucket=None, 
                  cam=False,
                  org=None):
@@ -44,9 +41,8 @@ class Measurement:
             self.flow = Flow(FLOW_SENSOR_GPIO_1=device_flow_GPIOs[0], FLOW_SENSOR_GPIO_2=device_flow_GPIOs[1],)
         if cam:
             self.cam = Cam(resolution=[1920, 1080], filetype="jpeg")
-        if client:
-            self.client = client
-            self.org = org
+        if host:
+            self.client = InfluxDBClient(url=host, token=token, org=org)
             self.bucket = bucket
         self.wait_time = sleep_time ## seconds
 
@@ -62,11 +58,7 @@ class Measurement:
             f = self.flow.get_flow()
             c = self.cam.shoot(filename=now.strftime("%Y_%m_%d__%H_%M_%S"))
 
-
-            if self.number_of_scales == 1:
-                print("we cannot do this for now")
-                
-            elif self.number_of_scales == 2:
+            if self.number_of_scales  == 2:
                 p_01 = Point(db_name).field(f"scale_left",      float(w["00"])              * 1000, ).time(now)
                 p_02 = Point(db_name).field(f"scale_right",     float(w["01"])              * 1000, ).time(now)
                 p_03 = Point(db_name).field(f"temp_left_bot",   float(t[0]["temperature"])          ).time(now)
@@ -104,14 +96,19 @@ if __name__ == "__main__":
                 2: {"uid": "0120211005135902", "comment": "mux_4kg_2", "number_of_scales": 8},
                 3: {"uid": "0020240425142741", "comment": "mux_8kg_1", "number_of_scales": 4},}
 
+
+
     m = Measurement(device_temp_usb="ttyUSB0", 
                     device_scale_usb="ttyUSB1", 
                     scale_uid="0020240425142741", 
                     device_flow_GPIOs=[12, 13],
                     number_of_scales=2, 
-                    cam=True,
                     measurements=0, 
                     sleep_time=10, 
-                    client=client,
+                    host=host,
+                    token=token,
+                    bucket=bucket,
                     org=org,
-                    bucket=bucket).to_influx()
+                    cam=False)
+    m.to_terminal()
+    # m.to_influx()
