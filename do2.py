@@ -147,6 +147,6 @@ if __name__ == "__main__":
                     token=token,
                     bucket=bucket,
                     org=org,
-                    cam=True)
+                    cam=False)
     #m.to_terminal()
     m.to_influx()
