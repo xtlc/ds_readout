@@ -79,10 +79,11 @@ class Measurement:
                 write_to_influx.write(bucket=self.bucket, record=[p_01, p_02, p_03, p_04, p_05, p_06, p_07, p_08, p_09, p_10, p_11, p_12, p_13, p_14, p_15, p_16])
             else:
                 print(f"number of scales not supported: {self.number_of_scales}")
+                exit()
+            self.to_terminal(w=w, t=t, f=f)
             time.sleep(self.wait_time)
-            print("points written to influx: ", now)
 
-    def to_terminal(self):
+    def to_terminal(self, w=None, f=None, t=None):
 
         def my_format(v):
             total_width = 10
@@ -96,24 +97,27 @@ class Measurement:
 
         if self.number_of_scales == 2:
             head = "scale_left | scale_right | t_left_top | t_left_bot | t_mid_top  | t_mid_bot  | t_right_top | t_right_bot | h_left_top | h_left_bot | h_mid_top  | h_mid_bot | h_right_top | h_right_bot | flow_left | flow_right |\n"
-            head += "-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
+            head += "------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
             
             counter = 0
             while True:
                 if counter % 10 == 0:
                     print(head)
                 out = ""
-                if hasattr(self, "scales"): 
-                    w = self.scales.get_all_weights()
+                if hasattr(self, "scales"):
+                    if w == None: 
+                        w = self.scales.get_all_weights()
                     out += f"""{my_format(w["00"])} |  {my_format(w["01"])} | """
 
                 if hasattr(self, "temps"):
-                    t = self.temps.get_all_temps()
+                    if t == None:
+                        t = self.temps.get_all_temps()
                     out += f"""{my_format(t[1]["temperature"])} | {my_format(t[0]["temperature"])} | {my_format(t[3]["temperature"])} | {my_format(t[2]["temperature"])} |  {my_format(t[5]["temperature"])} |  {my_format(t[4]["temperature"])} | """
                     out += f"""{my_format(t[1]["humidity"])} | {my_format(t[0]["humidity"])} | {my_format(t[3]["humidity"])} | {my_format(t[2]["humidity"])} | {my_format(t[5]["humidity"])} | {my_format(t[4]["humidity"])} | """
 
                 if hasattr(self, "flow"):
-                    f = self.flow.get_flow()
+                    if f == None:
+                        f = self.flow.get_flow()
                     out += f"""{my_format(f["flow_left"])} | {my_format(f["flow_right"])} | """
 
                 print(out)
@@ -137,5 +141,5 @@ if __name__ == "__main__":
                     bucket=bucket,
                     org=org,
                     cam=False)
-    m.to_terminal()
-    # m.to_influx()
+    #m.to_terminal()
+    m.to_influx()
