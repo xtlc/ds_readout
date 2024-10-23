@@ -102,8 +102,8 @@ class Measurement:
             return f"""{formatted_value}"""
 
         if self.number_of_scales == 2:
-            head = "scale_left | scale_right | \033[31mt_left_top\033[39m | \033[31mt_left_bot\033[39m | \033[31mt_mid_top\033[39m  | \033[31mt_mid_bot\033[39m  | \033[31mt_right_top\033[39m | \033[31mt_right_bot\033[39m "
-            head += "| h_left_top | h_left_bot | h_mid_top  | h_mid_bot | h_right_top | h_right_bot | flow_left | flow_right |\n"
+            head = "\n\033[33mscale_left\033[39m | \033[33mscale_right\033[39m | \033[31mt_left_top\033[39m | \033[31mt_left_bot\033[39m | \033[31mt_mid_top\033[39m  | \033[31mt_mid_bot\033[39m  | \033[31mt_right_top\033[39m | \033[31mt_right_bot\033[39m "
+            head += "| \033[36mh_left_top\033[39m | \033[36mh_left_bot\033[39m | \033[36mh_mid_top\033[39m  | \033[36mh_mid_bot\033[39m | \033[36mh_right_top\033[39m | \033[36mh_right_bot\033[39m | \033[34mflow_left\033[39m | \033[34mflow_right\033[39m |\n"
             head += "------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
             
             counter = 0
@@ -114,18 +114,18 @@ class Measurement:
                 if hasattr(self, "scales"):
                     if w == None: 
                         w = self.scales.get_all_weights()
-                    out += f"""{my_format(w["00"])} |  {my_format(w["01"])} | """
+                    out += f"""\033[33m{my_format(w["00"])}\033[39m |  \033[33m{my_format(w["01"])}\033[36m | """
 
                 if hasattr(self, "temps"):
                     if t == None:
                         t = self.temps.get_all_temps()
                     out += f"""\033[31m{my_format(t[1]["temperature"])}\033[39m | \033[31m{my_format(t[0]["temperature"])}\033[39m | \033[31m{my_format(t[3]["temperature"])}\033[39m | \033[31m{my_format(t[2]["temperature"])}\033[39m |  \033[31m{my_format(t[5]["temperature"])}\033[39m |  \033[31m{my_format(t[4]["temperature"])}\033[39m | """
-                    out += f"""{my_format(t[1]["humidity"])} | {my_format(t[0]["humidity"])} | {my_format(t[3]["humidity"])} | {my_format(t[2]["humidity"])} | {my_format(t[5]["humidity"])} | {my_format(t[4]["humidity"])} | """
+                    out += f"""\033[36m{my_format(t[1]["humidity"])}\033[39m | \033[36m{my_format(t[0]["humidity"])}\033[39m | \033[36m{my_format(t[3]["humidity"])}\033[39m | \033[36m{my_format(t[2]["humidity"])}\033[39m | \033[36m{my_format(t[5]["humidity"])}\033[39m | \033[36m{my_format(t[4]["humidity"])}\033[39m | """
 
                 if hasattr(self, "flow"):
                     if f == None:
                         f = self.flow.get_flow()
-                    out += f"""{my_format(f["flow_left"])} | {my_format(f["flow_right"])} | """
+                    out += f"""\033[34m{my_format(f["flow_left"])}\033[39m | \033[34m{my_format(f["flow_right"])}\033[39m | """
 
                 print(out)
                 counter += 1
