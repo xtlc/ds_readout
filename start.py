@@ -16,8 +16,6 @@ mux_dict = {1: {"uid": "0120211005135155", "comment": "mux_4kg_1", "number_of_sc
             2: {"uid": "0120211005135902", "comment": "mux_4kg_2", "number_of_scales": 8},
             3: {"uid": "0020240425142741", "comment": "mux_8kg_1", "number_of_scales": 4},}  
 
-
-
 def zero_all_scales():
     print("Executing zero_all_scales()...")
     from scales import Mux
@@ -25,12 +23,12 @@ def zero_all_scales():
     s.zero_all_scales()
 
 def to_terminal():
-    m = Measurement(device_temp_usb="ttyUSB0", device_scale_usb="ttyUSB1", scale_uid="0020240425142741", device_flow_GPIOs=[12, 13], number_of_scales=2, measurements=0, sleep_time=10, host=host, token=token, bucket=bucket, org=org, cam=False)
+    m = Measurement(device_temp_usb="ttyUSB0", device_scale_usb="ttyUSB1", scale_uid="0020240425142741", device_flow_GPIOs=[12, 13], number_of_scales=2, measurements=0, sleep_time=3, host=host, token=token, bucket=bucket, org=org, cam=False)
     m.to_terminal()
     print("Executing to_terminal()...")
 
 def to_influx():
-    m = Measurement(device_temp_usb="ttyUSB0", device_scale_usb="ttyUSB1", scale_uid="0020240425142741", device_flow_GPIOs=[12, 13], number_of_scales=2, measurements=0, sleep_time=10, host=host, token=token, bucket=bucket, org=org, cam=False)
+    m = Measurement(device_temp_usb="ttyUSB0", device_scale_usb="ttyUSB1", scale_uid="0020240425142741", device_flow_GPIOs=[12, 13], number_of_scales=2, measurements=0, sleep_time=3, host=host, token=token, bucket=bucket, org=org, cam=False)
     m.to_influx()
     print("Executing to_influx()...")
 
