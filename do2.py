@@ -102,7 +102,7 @@ class Measurement:
             return f"""{formatted_value}"""
 
         if self.number_of_scales == 2:
-            head = "scale_left | scale_right | \033[31mt_left_top\033[39m | \033[31mt_left_bot\033[39m | \033[31mt_mid_top\033[39m  | \033[31mt_mid_bot\033[39m  | \033[31mt_right_top\033[39m | \033[31mt_right_bot\033[39m"
+            head = "scale_left | scale_right | \033[31mt_left_top\033[39m | \033[31mt_left_bot\033[39m | \033[31mt_mid_top\033[39m  | \033[31mt_mid_bot\033[39m  | \033[31mt_right_top\033[39m | \033[31mt_right_bot\033[39m "
             head += "| h_left_top | h_left_bot | h_mid_top  | h_mid_bot | h_right_top | h_right_bot | flow_left | flow_right |\n"
             head += "------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
             
@@ -119,7 +119,7 @@ class Measurement:
                 if hasattr(self, "temps"):
                     if t == None:
                         t = self.temps.get_all_temps()
-                    out += f"""{my_format(t[1]["temperature"])} | {my_format(t[0]["temperature"])} | {my_format(t[3]["temperature"])} | {my_format(t[2]["temperature"])} |  {my_format(t[5]["temperature"])} |  {my_format(t[4]["temperature"])} | """
+                    out += f"""\033[31m{my_format(t[1]["temperature"])}\033[39m | \033[31m{my_format(t[0]["temperature"])}\033[39m | \033[31m{my_format(t[3]["temperature"])}\033[39m | \033[31m{my_format(t[2]["temperature"])}\033[39m |  \033[31m{my_format(t[5]["temperature"])}\033[39m |  \033[31m{my_format(t[4]["temperature"])}\033[39m | """
                     out += f"""{my_format(t[1]["humidity"])} | {my_format(t[0]["humidity"])} | {my_format(t[3]["humidity"])} | {my_format(t[2]["humidity"])} | {my_format(t[5]["humidity"])} | {my_format(t[4]["humidity"])} | """
 
                 if hasattr(self, "flow"):
