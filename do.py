@@ -4,7 +4,7 @@ from influxdb_client_3 import InfluxDBClient3, Point
 from datetime import datetime, timezone
 import RPi.GPIO as GPIO
 from scales import Mux
-from ds210 import Temp
+from ens210 import Temp
 
 
 # Initialize the environment

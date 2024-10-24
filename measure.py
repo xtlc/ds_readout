@@ -3,7 +3,7 @@ from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 from datetime import datetime
 from scales import Mux
-from ds210 import Temp
+from ens210 import Temp
 from flow import Flow
 from cam import Cam
 import colorama
@@ -38,11 +38,6 @@ class Measurement:
 
         # Initialize colorama
         colorama.init()
-
-    
-
-
-
 
     def to_influx(self, db_name="teststand_1"):
         print("start writing to influx ...")
