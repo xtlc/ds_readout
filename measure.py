@@ -69,6 +69,7 @@ class Measurement:
                 p_14 = Point(db_name).field(f"humid_right_top", float(t[5]["humidity"])             ).time(now)
                 p_15 = Point(db_name).field(f"flow_left",       float(f["flow_left"])               ).time(now)
                 p_16 = Point(db_name).field(f"flow_right",      float(f["flow_right"])              ).time(now)
+                
                 try:
                     write_to_influx.write(bucket=self.bucket, record=[p_01, p_02, p_03, p_04, p_05, p_06, p_07, p_08, p_09, p_10, p_11, p_12, p_13, p_14, p_15, p_16])
                 except Exception as E:
