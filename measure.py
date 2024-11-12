@@ -53,22 +53,70 @@ class Measurement:
                 self.cam.shoot(filename=now.strftime("%Y_%m_%d__%H_%M_%S"))
 
             if self.number_of_scales  == 2:
-                p_01 = Point(db_name).field(f"scale_left",      float(w["00"])              * 1000, ).time(now)
-                p_02 = Point(db_name).field(f"scale_right",     float(w["01"])              * 1000, ).time(now)
-                p_03 = Point(db_name).field(f"temp_left_bot",   float(t[0]["temperature"])          ).time(now)
-                p_04 = Point(db_name).field(f"humid_left_bot",  float(t[0]["humidity"])             ).time(now)
-                p_05 = Point(db_name).field(f"temp_left_top",   float(t[1]["temperature"])          ).time(now)
-                p_06 = Point(db_name).field(f"humid_left_top",  float(t[1]["humidity"])             ).time(now)
-                p_07 = Point(db_name).field(f"temp_mid_bot",    float(t[2]["temperature"])          ).time(now)
-                p_08 = Point(db_name).field(f"humid_mid_bot",   float(t[2]["humidity"])             ).time(now)
-                p_09 = Point(db_name).field(f"temp_mid_top",    float(t[3]["temperature"])          ).time(now)
-                p_10 = Point(db_name).field(f"humid_mid_top",   float(t[3]["humidity"])             ).time(now)
-                p_11 = Point(db_name).field(f"temp_right_bot",  float(t[4]["temperature"])          ).time(now)
-                p_12 = Point(db_name).field(f"humid_right_bot", float(t[4]["humidity"])             ).time(now)
-                p_13 = Point(db_name).field(f"temp_right_top",  float(t[5]["temperature"])          ).time(now)
-                p_14 = Point(db_name).field(f"humid_right_top", float(t[5]["humidity"])             ).time(now)
-                p_15 = Point(db_name).field(f"flow_left",       float(f["flow_left"])               ).time(now)
-                p_16 = Point(db_name).field(f"flow_right",      float(f["flow_right"])              ).time(now)
+                try:
+                    p_01 = Point(db_name).field(f"scale_left",      float(w["00"])              * 1000, ).time(now)
+                except IndexError as E:
+                    continue
+                try:
+                    p_02 = Point(db_name).field(f"scale_right",     float(w["01"])              * 1000, ).time(now)
+                except IndexError as E:
+                    continue
+                try:
+                    p_03 = Point(db_name).field(f"temp_left_bot",   float(t[0]["temperature"])          ).time(now)
+                except IndexError as E:
+                    continue
+                try:
+                    p_04 = Point(db_name).field(f"humid_left_bot",  float(t[0]["humidity"])             ).time(now)
+                except IndexError as E:
+                    continue
+                try:
+                    p_05 = Point(db_name).field(f"temp_left_top",   float(t[1]["temperature"])          ).time(now)
+                except IndexError as E:
+                    continue
+                try:
+                    p_06 = Point(db_name).field(f"humid_left_top",  float(t[1]["humidity"])             ).time(now)
+                except IndexError as E:
+                    continue
+                try:
+                    p_07 = Point(db_name).field(f"temp_mid_bot",    float(t[2]["temperature"])          ).time(now)
+                except IndexError as E:
+                    continue
+                try:
+                    p_08 = Point(db_name).field(f"humid_mid_bot",   float(t[2]["humidity"])             ).time(now)
+                except IndexError as E:
+                    continue
+                try:
+                    p_09 = Point(db_name).field(f"temp_mid_top",    float(t[3]["temperature"])          ).time(now)
+                except IndexError as E:
+                    continue
+                try:
+                    p_10 = Point(db_name).field(f"humid_mid_top",   float(t[3]["humidity"])             ).time(now)
+                except IndexError as E:
+                    continue
+                try:
+                    p_11 = Point(db_name).field(f"temp_right_bot",  float(t[4]["temperature"])          ).time(now)
+                except IndexError as E:
+                    continue
+                try:
+                    p_12 = Point(db_name).field(f"humid_right_bot", float(t[4]["humidity"])             ).time(now)
+                except IndexError as E:
+                    continue
+                try:
+                    p_13 = Point(db_name).field(f"temp_right_top",  float(t[5]["temperature"])          ).time(now)
+                except IndexError as E:
+                    continue
+                try:
+                    p_14 = Point(db_name).field(f"humid_right_top", float(t[5]["humidity"])             ).time(now)
+                except IndexError as E:
+                    continue
+                try:
+                    p_15 = Point(db_name).field(f"flow_left",       float(f["flow_left"])               ).time(now)
+                except IndexError as E:
+                    continue
+                try:
+                    p_16 = Point(db_name).field(f"flow_right",      float(f["flow_right"])              ).time(now)
+                except IndexError as E:
+                    continue
                 
                 try:
                     write_to_influx.write(bucket=self.bucket, record=[p_01, p_02, p_03, p_04, p_05, p_06, p_07, p_08, p_09, p_10, p_11, p_12, p_13, p_14, p_15, p_16])

@@ -7,3 +7,5 @@ mux is the name of the multiplexer, it can be read on the back of the scale boar
 
 
 sudo apt install fswebcam
+
+im env dann: python -m pip install rpi-lgpio
