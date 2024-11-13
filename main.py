@@ -12,6 +12,9 @@ def main(page: ft.Page):
 
     # Define button click handlers
     def calibrate_click(e):
+        from scales import Mux
+        s = Mux(device="ttyUSB1", uid="0020240425142741", number_of_scales=2, max_values=0, sleep_time=0)
+        s.zero_all_scales()
         message.value = "calibrating ..."
         page.update()
 
