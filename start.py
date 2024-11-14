@@ -10,6 +10,7 @@ env.read_env()
 token = env("INFLUX_TOKEN")
 org = "abaton_influx"
 host = "https://eu-central-1-1.aws.cloud2.influxdata.com"
+host = "127.0.0.1:8186"
 bucket = env("BUCKET")
 
 mux_dict = {1: {"uid": "0120211005135155", "comment": "mux_4kg_1", "number_of_scales": 8}, 
