@@ -35,7 +35,8 @@ class PT100:
     def get_temps(self):
         values = {}
         for name, address in self.sensors.items():
-            with open(address, "r") as w1s:
+            print("working on address", address[0])
+            with open(address[0], "r") as w1s:
                 data = w1s.read()
                 try:
                     values[name] =  float(data.split("t=")[1])/1000
