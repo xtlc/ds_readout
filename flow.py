@@ -58,7 +58,7 @@ class Flow:
 
 if __name__ == "__main__":
     print("Test mode running ...")    # You can call your function here if needed
-    f = Flow()
+    f = Flow(FLOW_SENSOR_GPIO_RIGHT=18, FLOW_SENSOR_GPIO_LEFT=27)
     while True:
         t = f.get_flow()
         print(t)
