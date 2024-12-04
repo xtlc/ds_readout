@@ -51,7 +51,7 @@ if __name__ == "__main__":
     print("Test mode running ...")    # You can call your function here if needed
     f = PT100(PT100_WATER_IN_RIGHT="0000006a2c70", PT100_WATER_OUT_RIGHT="0000006ada1a", PT100_WATER_IN_LEFT="", PT100_WATER_OUT_LEFT="")
     while True:
-        t = f.get_flow()
+        t = f.get_temps()
         print(t)
 
 ## sensor 1
