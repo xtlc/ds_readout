@@ -9,3 +9,41 @@ mux is the name of the multiplexer, it can be read on the back of the scale boar
 sudo apt install fswebcam
 
 im env dann: python -m pip install rpi-lgpio
+
+
+cam damit die IR cam funktioniert: piircam
+
+für onewirebus (pt100):
+
+ - one wire protokoll aktivieren unter Schnittstellen im Pi Manager
+ - reboot
+ - sudo nano /boot/firmware/config.txt:
+    dtoverlay=w1-gpio,gpiopin=26 (alle sensoren gehen auf den einen pin) anfügen am ende (=pullup wiederstand auf 26)
+
+    Testen:
+    This command loads the w1-gpio kernel module, which is responsible for enabling the GPIO pin for one-wire communication:
+
+    sudo modprobe w1-gpio
+
+    Then, the following line loads the w1-therm kernel module, which adds support for DS18B20-specific features, such as reading temperature data from the sensor.
+
+    sudo modprobe w1-therm
+
+    Then, change the current working directory to /sys/bus/w1/devices/. In this directory, it exposes information about connected one-wire devices, including the DS18B20 sensor (if it can find the sensor).
+
+    cd /sys/bus/w1/devices/
+
+    Finally, list the contents of the devices folder that should show one or more directories, each representing a one-wire device.
+
+    ls
+
+    In the case of the DS18B20 temperature sensor, you’ll see a folder like 28-xxxxxxxxxxxx, where xxxxxxxxxxxx is the unique address of your DS18B20 sensor.
+    Navigate to the directory representing the DS18B20 sensor. For example, in my case it’s as follows (use the directory of your sensor):
+
+    cd 28-03173311a0ff
+
+    After navigating to the directory representing the DS18B20 sensor, you can use the cat command to read the contents of the w1_slave file. This file contains the raw temperature data in a specific format.
+
+    cat w1_slave
+
+    The contents of the w1_slave file will look something as shown in the next screenshot (first line contains the status of the reading: YES means a valid reading, and the second line shows the temperature (you need to divide by 1000 to get it in degrees Celsius).
