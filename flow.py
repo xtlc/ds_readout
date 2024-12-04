@@ -56,6 +56,11 @@ class Flow:
             
             
 
+if __name__ == "__main__":
+    print("Test mode running ...")    # You can call your function here if needed
+    f = Flow()
+    while True:
+        f.get_flow()
 # # Create an instance of the Flow class and start monitoring
 # flow_monitor = Flow()
 # for i in range(1, 11):
