@@ -1,27 +1,18 @@
 from pathlib import Path
 
-
-
-
-
+BASEDIR = Path("/sys/bus/w1/devices/")
 
 class PT100:
     def __init__(self, PT100_WATER_IN_RIGHT=None, PT100_WATER_OUT_RIGHT=None, PT100_WATER_IN_LEFT=None, PT100_WATER_OUT_LEFT=None):
-      #  self.pt100_in_r = f"""28-{PT100_WATER_IN_RIGHT}"""
-      #  self.pt100_out_r = f"""28-{PT100_WATER_OUT_RIGHT}"""
-      #  self.pt100_in_l = f"""28-{PT100_WATER_IN_LEFT}"""
-      #  self.pt100_out_l = f"""28-{PT100_WATER_OUT_LEFT}"""
-      #  self.path = Path("/sys/bus/w1/devices/")
-      #  self.sensors = [folder.name for folder in Path("/sys/bus/w1/devices/").glob("28-*/")] ## add /w1_slave
         self.sensors = {}
         if PT100_WATER_IN_RIGHT:
-            self.sensors["in_ri"] =  Path("/sys/bus/w1/devices/").joinpath(f"""28-{PT100_WATER_IN_RIGHT}""", "w1_slave"),
+            self.sensors["in_ri"] =  BASEDIR.joinpath(f"""28-{PT100_WATER_IN_RIGHT}""", "w1_slave"),
         if PT100_WATER_OUT_RIGHT:
-            self.sensors["out_ri"] = Path("/sys/bus/w1/devices/").joinpath(f"""28-{PT100_WATER_OUT_RIGHT}""", "w1_slave"),
+            self.sensors["out_ri"] = BASEDIR.joinpath(f"""28-{PT100_WATER_OUT_RIGHT}""", "w1_slave"),
         if PT100_WATER_IN_LEFT:
-            self.sensors["in_le"] =  Path("/sys/bus/w1/devices/").joinpath(f"""28-{PT100_WATER_IN_LEFT}""", "w1_slave"),
+            self.sensors["in_le"] =  BASEDIR.joinpath(f"""28-{PT100_WATER_IN_LEFT}""", "w1_slave"),
         if PT100_WATER_OUT_LEFT:
-            self.sensors["out_le"] = Path("/sys/bus/w1/devices/").joinpath(f"""28-{PT100_WATER_OUT_LEFT}""", "w1_slave")
+            self.sensors["out_le"] = BASEDIR.joinpath(f"""28-{PT100_WATER_OUT_LEFT}""", "w1_slave")
 
 
     def get_temps(self):
@@ -42,6 +33,9 @@ class PT100:
 
 if __name__ == "__main__":
     print("Test mode running ...")    # You can call your function here if needed
+    for item in BASEDIR.iterdir():
+        if item.is_dir():
+            print(item.name)
     f = PT100(PT100_WATER_IN_RIGHT="0000006a2c70", PT100_WATER_OUT_RIGHT="0000006ada1a")
     while True:
         t = f.get_temps()
