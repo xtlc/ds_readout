@@ -35,7 +35,7 @@ if __name__ == "__main__":
     print("Test mode running ...")    # You can call your function here if needed
     for item in BASEDIR.iterdir():
         if item.is_dir():
-            print(item.name)
+            print(f"""found sensor: {item.name}""")
     f = PT100(PT100_WATER_IN_RIGHT="0000006a2c70", PT100_WATER_OUT_RIGHT="0000006ada1a")
     while True:
         t = f.get_temps()
