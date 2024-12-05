@@ -4,6 +4,7 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 from datetime import datetime
 from scales import Mux
 from ens210 import Temp
+from pt100 import PT100
 from flow import Flow
 from cam import Cam
 import colorama
@@ -13,10 +14,7 @@ class Measurement:
                  device_temp_usb=None,
                  device_flow_GPIOs=None, 
                  device_scale_usb=None, 
-                 pt100_water_in_left=None,
-                 pt100_water_out_left=None,
-                 pt100_water_in_right=None,
-                 pt100_water_out_right=None,
+                 pt100s=None,
                  scale_uid=None, 
                  number_of_scales=0, 
                  measurements=0, 
@@ -33,6 +31,8 @@ class Measurement:
             self.temps = Temp(device=device_temp_usb)
         if device_flow_GPIOs:
             self.flow = Flow(FLOW_SENSOR_GPIO_RIGHT=device_flow_GPIOs[0], FLOW_SENSOR_GPIO_LEFT=device_flow_GPIOs[1],)
+        if not all(value is None for value in pt100s.values()) == 0:
+            self.pt100s = PT100(PT100_WATER_IN_RIGHT=pt100s["in_ri"], PT100_WATER_OUT_RIGHT=pt100s["out_ri"], PT100_WATER_IN_LEFT=pt100s["in_le"], PT100_WATER_OUT_LEFT=pt100s["out_le"])
         if cam:
             self.cam = Cam(resolution=[1920, 1080], filetype="jpeg")
         if host:
@@ -53,10 +53,13 @@ class Measurement:
             w = self.scales.get_all_weights()
             t = self.temps.get_all_temps()
             f = self.flow.get_flow()
+            p = self.pt100s.get_temps()
             if hasattr(self, "cam"):
                 self.cam.shoot(filename=now.strftime("%Y_%m_%d__%H_%M_%S"))
 
             if self.number_of_scales  == 2:
+
+                ## scale values
                 try:
                     p_01 = Point(db_name).field(f"scale_left",      float(w["00"])              * 1000, ).time(now)
                 except IndexError as E:
@@ -65,6 +68,8 @@ class Measurement:
                     p_02 = Point(db_name).field(f"scale_right",     float(w["01"])              * 1000, ).time(now)
                 except IndexError as E:
                     continue
+                
+                ## temperature values
                 try:
                     p_03 = Point(db_name).field(f"temp_left_bot",   float(t[0]["temperature"])          ).time(now)
                 except IndexError as E:
@@ -113,6 +118,8 @@ class Measurement:
                     p_14 = Point(db_name).field(f"humid_right_top", float(t[5]["humidity"])             ).time(now)
                 except IndexError as E:
                     continue
+                
+                ## flow values
                 try:
                     p_15 = Point(db_name).field(f"flow_left",       float(f["flow_left"])               ).time(now)
                 except IndexError as E:
@@ -122,21 +129,41 @@ class Measurement:
                 except IndexError as E:
                     continue
                 
+                ## pt100 values
                 try:
-                    write_to_influx.write(bucket=self.bucket, record=[p_01, p_02, p_03, p_04, p_05, p_06, p_07, p_08, p_09, p_10, p_11, p_12, p_13, p_14, p_15, p_16])
+                    p_17 = Point(db_name).field(f"water_temp_ri_in",  float(p["in_ri"])                 ).time(now)
+                except IndexError as E:
+                    continue
+                try:
+                    p_18 = Point(db_name).field(f"water_temp_lri_out", float(p[5]["out_ri"])            ).time(now)
+                except IndexError as E:
+                    continue
+                try:
+                    p_19 = Point(db_name).field(f"water_temp_le_in", float(p["in_le"])                  ).time(now)
+                except IndexError as E:
+                    continue
+                try:
+                    p_20 = Point(db_name).field(f"water_temp_le_out", float(p["out_le"])                ).time(now)
+                except IndexError as E:
+                    continue
+
+                records = [p_01, p_02, p_03, p_04, p_05, p_06, p_07, p_08, p_09, p_10, p_11, p_12, p_13, p_14, p_15, p_16, p_17, p_18, p_19, p_20]
+                
+                try:
+                    write_to_influx.write(bucket=self.bucket, record=records)
                 except Exception as E:
                     print("caught an exception on connecting with influx ... waiting 3s and trying again")
                     time.sleep(3)
-                    write_to_influx.write(bucket=self.bucket, record=[p_01, p_02, p_03, p_04, p_05, p_06, p_07, p_08, p_09, p_10, p_11, p_12, p_13, p_14, p_15, p_16])
+                    write_to_influx.write(bucket=self.bucket, record=records)
                     print("now we succeded ...")
             else:
                 print(f"number of scales not supported: {self.number_of_scales}")
                 exit()
-            self.print_to_terminal(counter=counter, w=w, t=t, f=f)
+            self.print_to_terminal(counter=counter, w=w, t=t, f=f, p=p)
             counter += 1
             time.sleep(self.wait_time)
 
-    def print_to_terminal(self, counter=None, w=None, f=None, t=None):
+    def print_to_terminal(self, counter=None, w=None, f=None, t=None,p=None):
         def my_format(v):
             total_width = 10
             if isinstance(v, str):
