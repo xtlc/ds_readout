@@ -20,7 +20,7 @@ class PT100:
     def get_temps(self):
         values = {}
         for name, address in self.sensors.items():
-            print("working on address", address)
+            # print("working on address", address)
             with open(address, "r") as w1s:
                 data = w1s.read()
                 try:
