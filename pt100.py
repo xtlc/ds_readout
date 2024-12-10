@@ -37,7 +37,7 @@ if __name__ == "__main__":
         if item.is_dir():
             print(f"""found sensor: {item.name}""")
     print("----------------------------------------------------------------------------")
-    f = PT100(PT100_WATER_IN_RIGHT="0000006a2c70", PT100_WATER_OUT_RIGHT="0000006ada1a")
+    f = PT100(PT100_WATER_IN_RIGHT="0000006a2c70", PT100_WATER_OUT_RIGHT="0000006ada1a", PT100_WATER_IN_LEFT="a7d0f91d64ff", PT100_WATER_OUT_RIGHT="d5d3f91d64ff")
     while True:
         t = f.get_temps()
         print(t)
