@@ -29,7 +29,19 @@ def to_terminal():
     print("Executing to_terminal()...")
 
 def to_influx():
-    m = Measurement(device_temp_usb="ttyUSB0", device_scale_usb="ttyUSB1", scale_uid="0020240425142741", device_flow_GPIOs=[12, 13], number_of_scales=2, measurements=0, sleep_time=60, host=host, token=token, bucket=bucket, org=org, cam=True)
+    m = Measurement(device_temp_usb="ttyUSB0", 
+                    device_scale_usb="ttyUSB1", 
+                    pt100s={"in_ri": "0000006a2c70", "out_ri": "0000006ada1a", "in_le": "d5d3f91d64ff", "out_le": "a7d0f91d64ff"}
+                    scale_uid="0020240425142741", 
+                    device_flow_GPIOs=[12, 13], 
+                    number_of_scales=2, 
+                    measurements=0, 
+                    sleep_time=60, 
+                    host=host, 
+                    token=token, 
+                    bucket=bucket, 
+                    org=org, 
+                    cam=True)
     m.to_influx()
     print("Executing to_influx()...")
 
