@@ -14,14 +14,14 @@ class PT100:
         if PT100_WATER_OUT_LEFT:
             self.sensors["out_le"] = BASEDIR.joinpath(f"""28-{PT100_WATER_OUT_LEFT}""", "w1_slave")
 
-        print("\n\n------->", self.sensors, "<------\n\n")
+        print("\n\n------->", [s for s in self.sensors], "<------\n\n")
 
 
     def get_temps(self):
         values = {}
         for name, address in self.sensors.items():
             print("working on address", address)
-            with open(address[0], "r") as w1s:
+            with open(address, "r") as w1s:
                 data = w1s.read()
                 try:
                     values[name] =  float(data.split("t=")[1])/1000
