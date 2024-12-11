@@ -31,7 +31,7 @@ class Measurement:
             self.temps = Temp(device=device_temp_usb)
         if device_flow_GPIOs:
             self.flow = Flow(FLOW_SENSOR_GPIO_RIGHT=device_flow_GPIOs[0], FLOW_SENSOR_GPIO_LEFT=device_flow_GPIOs[1],)
-        if not all(value is None for value in pt100s.values()) == 0:
+        if pt100s != None:
             self.pt100s = PT100(PT100_WATER_IN_RIGHT=pt100s["in_ri"], PT100_WATER_OUT_RIGHT=pt100s["out_ri"], PT100_WATER_IN_LEFT=pt100s["in_le"], PT100_WATER_OUT_LEFT=pt100s["out_le"])
         if cam:
             self.cam = Cam(resolution=[1920, 1080], filetype="jpeg")
