@@ -44,7 +44,6 @@ class Temp:
         return r.decode("utf-8").strip("\r\n") 
     
     def sanitize(self, readout):
-        print(readout)
         tmp = readout.split(" ")
         return {"sensor": int(tmp[0]), "temp": float(tmp[1]), "humid": float(tmp[2])}
 
