@@ -50,6 +50,6 @@ class Temp:
 
 if __name__ == "__main__":
     t = Temp(device="ttyUSB0")
-    while True
+    while True:
         print(t.get_all_temps())
         time.sleep(1)
