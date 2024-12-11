@@ -178,8 +178,8 @@ class Measurement:
 
         if self.number_of_scales == 2:
             head = "\n\033[33mscale_left\033[39m | \033[33mscale_right\033[39m | \033[31mt_left_top\033[39m | \033[31mt_left_bot\033[39m | \033[31mt_mid_top\033[39m  | \033[31mt_mid_bot\033[39m  | \033[31mt_right_top\033[39m | \033[31mt_right_bot\033[39m "
-            head += "| \033[36mh_left_top\033[39m | \033[36mh_left_bot\033[39m | \033[36mh_mid_top\033[39m  | \033[36mh_mid_bot\033[39m | \033[36mh_right_top\033[39m | \033[36mh_right_bot\033[39m | \033[35mflow_left\033[39m | \033[35mflow_right\033[39m |\n"
-            head += "| \033[93mwater_in_left\033[39m | \033[93mwater_out_left\033[39m | \033[93mwater_in_right\033[39m | \033[93mwater_out_right\033[39m |"
+            head += "| \033[36mh_left_top\033[39m | \033[36mh_left_bot\033[39m | \033[36mh_mid_top\033[39m  | \033[36mh_mid_bot\033[39m | \033[36mh_right_top\033[39m | \033[36mh_right_bot\033[39m | \033[35mflow_left\033[39m | \033[35mflow_right\033[39m | "
+            head += "| \033[93mwater_in_left\033[39m | \033[93mwater_out_left\033[39m | \033[93mwater_in_right\033[39m | \033[93mwater_out_right\033[39m | \n"
             head += "------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
             
             if counter % 10 == 0:
