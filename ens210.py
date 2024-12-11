@@ -46,3 +46,10 @@ class Temp:
     def sanitize(self, readout):
         tmp = readout.split(" ")
         return {"sensor": int(tmp[0]), "temp": float(tmp[1]), "humid": float(tmp[2])}
+
+
+if __name__ == "__main__":
+    t = Temp(device="ttyUSB0")
+    while True
+        print(t.get_all_temps())
+        time.sleep(1)
