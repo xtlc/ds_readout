@@ -135,7 +135,7 @@ class Measurement:
                 except IndexError as E:
                     continue
                 try:
-                    p_18 = Point(db_name).field(f"water_temp_lri_out", float(p[5]["out_ri"])            ).time(now)
+                    p_18 = Point(db_name).field(f"water_temp_ri_out", float(p["out_ri"])            ).time(now)
                 except IndexError as E:
                     continue
                 try:
