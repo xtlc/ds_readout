@@ -24,8 +24,8 @@ def zero_all_scales():
     s.zero_all_scales()
 
 def to_terminal():
-    m = Measurement(device_temp_usb="ttyUSB0", 
-                    device_scale_usb="ttyUSB1", 
+    m = Measurement(device_temp_usb="ttyUSB1", 
+                    device_scale_usb="ttyUSB0", 
                     pt100s={"in_ri": "0000006a2c70", "out_ri": "0000006ada1a", "in_le": "d5d3f91d64ff", "out_le": "a7d0f91d64ff"},
                     scale_uid="0020240425142741", 
                     device_flow_GPIOs=[12, 13], 

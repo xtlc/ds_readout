@@ -54,6 +54,7 @@ class Measurement:
             t = self.temps.get_all_temps()
             f = self.flow.get_flow()
             p = self.pt100s.get_temps()
+            # print("---_>", p)
             if hasattr(self, "cam"):
                 self.cam.shoot(filename=now.strftime("%Y_%m_%d__%H_%M_%S"))
 
@@ -202,15 +203,23 @@ class Measurement:
                 w = self.scales.get_all_weights()
             else:
                 w = None
+                
             if hasattr(self, "temps"):
                 t = self.temps.get_all_temps()
             else:
                 t = None
+                
             if hasattr(self, "flow"):
                 f = self.flow.get_flow()
             else:
                 f = None
+                
+            if hasattr(self, "pt100s"): 
+                p = self.pt100s.get_temps()   
+            else:
+                p = None
+                
 
-            self.print_to_terminal(counter=counter, w=w, t=t, f=f)
+            self.print_to_terminal(counter=counter, w=w, t=t, f=f, p=p)
             counter += 1
             time.sleep(self.wait_time)
