@@ -30,8 +30,8 @@ class IRCam:
         self.output_folder=Path.cwd()
         self._setup_therm_cam()
         self._t0 = time.time()
-        self.Tmin = 0
-        self.Tmax = 40
+        self.Tmin = 5
+        self.Tmax = 30
 
     def _setup_therm_cam(self):
         """Initialize the thermal camera"""

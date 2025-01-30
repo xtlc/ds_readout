@@ -7,6 +7,7 @@ from ens210 import Temp
 from pt100 import PT100
 from flow import Flow
 from cam import Cam
+from ir import IRCam
 import colorama
 
 class Measurement:
@@ -23,6 +24,7 @@ class Measurement:
                  token=None,
                  bucket=None, 
                  cam=False,
+                 ircam=False,
                  org=None):
         if device_scale_usb:
             self.scales = Mux(device=device_scale_usb, uid=scale_uid, number_of_scales=number_of_scales, max_values=measurements, sleep_time=sleep_time)
@@ -35,6 +37,9 @@ class Measurement:
             self.pt100s = PT100(PT100_WATER_IN_RIGHT=pt100s["in_ri"], PT100_WATER_OUT_RIGHT=pt100s["out_ri"], PT100_WATER_IN_LEFT=pt100s["in_le"], PT100_WATER_OUT_LEFT=pt100s["out_le"])
         if cam:
             self.cam = Cam(resolution=[1920, 1080], filetype="jpeg")
+
+        if ircam:
+            self.ircam = IRCam()
         if host:
             self.client = InfluxDBClient(url=host, token=token, org=org)
             self.bucket = bucket
@@ -54,7 +59,8 @@ class Measurement:
             t = self.temps.get_all_temps()
             f = self.flow.get_flow()
             p = self.pt100s.get_temps()
-            # print("---_>", p)
+            if hasattr(self, "ircam"):
+                self.ircam.save_image()
             if hasattr(self, "cam"):
                 self.cam.shoot(filename=now.strftime("%Y_%m_%d__%H_%M_%S"))
 
