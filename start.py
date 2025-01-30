@@ -36,6 +36,7 @@ def to_terminal():
                     token=token, 
                     bucket=bucket, 
                     org=org, 
+                    ircam=False,
                     cam=False)
     m.to_terminal()
     print("Executing to_terminal()...")
@@ -52,8 +53,9 @@ def to_influx():
                     host=host, 
                     token=token, 
                     bucket=bucket, 
-                    org=org, 
-                    cam=False)
+                    org=org,
+                    ircam=True, 
+                    cam=True)
     m.to_influx()
     print("Executing to_influx()...")
 
