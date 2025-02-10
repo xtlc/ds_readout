@@ -89,108 +89,109 @@ class Measurement:
             if hasattr(self, "cam"):
                 self.cam.shoot(filename=now.strftime("%Y_%m_%d__%H_%M_%S"))
 
-            if self.number_of_scales  == 2:
+            ## scale values
+            try:
+                p_01 = Point(db_name).field(f"scale_left", float(w["00"]) * 1000, ).time(now)
+            except IndexError as E:
+                p_01 = Point(db_name).field(f"scale_left", float('nan')).time(now)
+            try:
+                p_02 = Point(db_name).field(f"scale_right", float(w["01"]) * 1000, ).time(now)
+            except IndexError as E:
+                p_02 = Point(db_name).field(f"scale_right", float('nan')).time(now)
+            
+            ## temperature values
+            try:
+                p_03 = Point(db_name).field(f"temp_left_bot", float(t[0]["temperature"])).time(now)
+            except IndexError as E:
+                p_04 = Point(db_name).field(f"temp_left_bot", float('nan')).time(now)
+            try:
+                p_04 = Point(db_name).field(f"humid_left_bot", float(t[0]["humidity"])).time(now)
+            except IndexError as E:
+                p_04 = Point(db_name).field(f"humid_left_bot", float('nan')).time(now)
+            
+            try:
+                p_05 = Point(db_name).field(f"temp_left_top", float(t[1]["temperature"])).time(now)
+            except IndexError as E:
+                p_05 = Point(db_name).field(f"temp_left_top", float('nan')).time(now)
+            try:
+                p_06 = Point(db_name).field(f"humid_left_top", float(t[1]["humidity"])).time(now)
+            except IndexError as E:
+                p_06 = Point(db_name).field(f"humid_left_top", float('nan')).time(now)
 
-                ## scale values
-                try:
-                    p_01 = Point(db_name).field(f"scale_left",      float(w["00"])              * 1000, ).time(now)
-                except IndexError as E:
-                    continue
-                try:
-                    p_02 = Point(db_name).field(f"scale_right",     float(w["01"])              * 1000, ).time(now)
-                except IndexError as E:
-                    continue
-                
-                ## temperature values
-                try:
-                    p_03 = Point(db_name).field(f"temp_left_bot",   float(t[0]["temperature"])          ).time(now)
-                except IndexError as E:
-                    continue
-                try:
-                    p_04 = Point(db_name).field(f"humid_left_bot",  float(t[0]["humidity"])             ).time(now)
-                except IndexError as E:
-                    continue
-                try:
-                    p_05 = Point(db_name).field(f"temp_left_top",   float(t[1]["temperature"])          ).time(now)
-                except IndexError as E:
-                    continue
-                try:
-                    p_06 = Point(db_name).field(f"humid_left_top",  float(t[1]["humidity"])             ).time(now)
-                except IndexError as E:
-                    continue
-                try:
-                    p_07 = Point(db_name).field(f"temp_mid_bot",    float(t[2]["temperature"])          ).time(now)
-                except IndexError as E:
-                    continue
-                try:
-                    p_08 = Point(db_name).field(f"humid_mid_bot",   float(t[2]["humidity"])             ).time(now)
-                except IndexError as E:
-                    continue
-                try:
-                    p_09 = Point(db_name).field(f"temp_mid_top",    float(t[3]["temperature"])          ).time(now)
-                except IndexError as E:
-                    continue
-                try:
-                    p_10 = Point(db_name).field(f"humid_mid_top",   float(t[3]["humidity"])             ).time(now)
-                except IndexError as E:
-                    continue
-                try:
-                    p_11 = Point(db_name).field(f"temp_right_bot",  float(t[4]["temperature"])          ).time(now)
-                except IndexError as E:
-                    continue
-                try:
-                    p_12 = Point(db_name).field(f"humid_right_bot", float(t[4]["humidity"])             ).time(now)
-                except IndexError as E:
-                    continue
-                try:
-                    p_13 = Point(db_name).field(f"temp_right_top",  float(t[5]["temperature"])          ).time(now)
-                except IndexError as E:
-                    continue
-                try:
-                    p_14 = Point(db_name).field(f"humid_right_top", float(t[5]["humidity"])             ).time(now)
-                except IndexError as E:
-                    continue
-                
-                ## flow values
-                try:
-                    p_15 = Point(db_name).field(f"flow_left",       float(f["flow_left"])               ).time(now)
-                except IndexError as E:
-                    continue
-                try:
-                    p_16 = Point(db_name).field(f"flow_right",      float(f["flow_right"])              ).time(now)
-                except IndexError as E:
-                    continue
-                
-                ## pt100 values
-                try:
-                    p_17 = Point(db_name).field(f"water_temp_ri_in",  float(p["in_ri"])                 ).time(now)
-                except IndexError as E:
-                    continue
-                try:
-                    p_18 = Point(db_name).field(f"water_temp_ri_out", float(p["out_ri"])            ).time(now)
-                except IndexError as E:
-                    continue
-                try:
-                    p_19 = Point(db_name).field(f"water_temp_le_in", float(p["in_le"])                  ).time(now)
-                except IndexError as E:
-                    continue
-                try:
-                    p_20 = Point(db_name).field(f"water_temp_le_out", float(p["out_le"])                ).time(now)
-                except IndexError as E:
-                    continue
+            try:
+                p_07 = Point(db_name).field(f"temp_mid_bot", float(t[2]["temperature"])).time(now)
+            except IndexError as E:
+                p_07 = Point(db_name).field(f"temp_mid_bot", float('nan')).time(now)
+            try:
+                p_08 = Point(db_name).field(f"humid_mid_bot", float(t[2]["humidity"])).time(now)
+            except IndexError as E:
+                p_08 = Point(db_name).field(f"humid_mid_bot", float('nan')).time(now)
+            
+            try:
+                p_09 = Point(db_name).field(f"temp_mid_top", float(t[3]["temperature"])).time(now)
+            except IndexError as E:
+                p_09 = Point(db_name).field(f"temp_mid_top", float('nan')).time(now)
+            try:
+                p_10 = Point(db_name).field(f"humid_mid_top", float(t[3]["humidity"])).time(now)
+            except IndexError as E:
+                p_10 = Point(db_name).field(f"humid_mid_top", float('nan')).time(now)
+            
+            try:
+                p_11 = Point(db_name).field(f"temp_right_bot", float(t[4]["temperature"])).time(now)
+            except IndexError as E:
+                p_11 = Point(db_name).field(f"temp_right_bot", float('nan')).time(now)
+            try:
+                p_12 = Point(db_name).field(f"humid_right_bot", float(t[4]["humidity"])).time(now)
+            except IndexError as E:
+                p_12 = Point(db_name).field(f"temp_left_top", float('nan')).time(now)
+            
+            try:
+                p_13 = Point(db_name).field(f"temp_right_top",  float(t[5]["temperature"])).time(now)
+            except IndexError as E:
+                p_13 = Point(db_name).field(f"temp_left_top", float('nan')).time(now)
+            try:
+                p_14 = Point(db_name).field(f"humid_right_top", float(t[5]["humidity"])).time(now)
+            except IndexError as E:
+                p_14 = Point(db_name).field(f"temp_left_top", float('nan')).time(now)
+            
+            ## flow values
+            try:
+                p_15 = Point(db_name).field(f"flow_left", float(f["flow_left"])).time(now)
+            except IndexError as E:
+                p_15 = Point(db_name).field(f"flow_left", float("nan").time(now)
+            try:
+                p_16 = Point(db_name).field(f"flow_right", float(f["flow_right"])).time(now)
+            except IndexError as E:
+                p_16 = Point(db_name).field(f"flow_right", float("nan")).time(now)
+            
+            ## pt100 values
+            try:
+                p_17 = Point(db_name).field(f"water_temp_ri_in",  float(p["in_ri"])).time(now)
+            except IndexError as E:
+                p_17 = Point(db_name).field(f"water_temp_ri_in",  float("nan")).time(now)
+            try:
+                p_18 = Point(db_name).field(f"water_temp_ri_out", float(p["out_ri"])).time(now)
+            except IndexError as E:
+                p_18 = Point(db_name).field(f"water_temp_ri_out", float("nan")).time(now)
+            try:
+                p_19 = Point(db_name).field(f"water_temp_le_in", float(p["in_le"])).time(now)
+            except IndexError as E:
+                p_19 = Point(db_name).field(f"water_temp_le_in", float("nan")).time(now)
+            try:
+                p_20 = Point(db_name).field(f"water_temp_le_out", float(p["out_le"])).time(now)
+            except IndexError as E:
+                p_20 = Point(db_name).field(f"water_temp_le_out", float("nan")).time(now)
 
-                records = [p_01, p_02, p_03, p_04, p_05, p_06, p_07, p_08, p_09, p_10, p_11, p_12, p_13, p_14, p_15, p_16, p_17, p_18, p_19, p_20]
-                
-                try:
-                    write_to_influx.write(bucket=self.bucket, record=records)
-                except Exception as E:
-                    print("caught an exception on connecting with influx ... waiting 3s and trying again")
-                    time.sleep(3)
-                    write_to_influx.write(bucket=self.bucket, record=records)
-                    print("now we succeded ...")
-            else:
-                print(f"number of scales not supported: {self.number_of_scales}")
-                exit()
+            records = [p_01, p_02, p_03, p_04, p_05, p_06, p_07, p_08, p_09, p_10, p_11, p_12, p_13, p_14, p_15, p_16, p_17, p_18, p_19, p_20]
+            
+            try:
+                write_to_influx.write(bucket=self.bucket, record=records)
+            except Exception as E:
+                print("caught an exception on connecting with influx ... waiting 3s and trying again")
+                time.sleep(3)
+                write_to_influx.write(bucket=self.bucket, record=records)
+                print("now we succeded ...")
+
             self.print_to_terminal(counter=counter, w=w, t=t, f=f, p=p)
             counter += 1
             time.sleep(self.wait_time)
