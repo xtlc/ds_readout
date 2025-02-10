@@ -158,7 +158,7 @@ class Measurement:
             try:
                 p_15 = Point(db_name).field(f"flow_left", float(f["flow_left"])).time(now)
             except IndexError as E:
-                p_15 = Point(db_name).field(f"flow_left", float("nan").time(now)
+                p_15 = Point(db_name).field(f"flow_left", float("nan")).time(now)
             try:
                 p_16 = Point(db_name).field(f"flow_right", float(f["flow_right"])).time(now)
             except IndexError as E:
