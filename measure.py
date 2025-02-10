@@ -45,8 +45,24 @@ class Measurement:
             self.bucket = bucket
         self.wait_time = sleep_time ## seconds
 
+        # initialize tests:
+        self.test()
+
         # Initialize colorama
         colorama.init()
+
+
+    def test(self):
+        w = self.scales.get_all_weights()
+        print(f"""Values from the scales: {w}""")
+        t = self.temps.get_all_temps()
+        print(f"""Values from the ens210: {t}""")
+        f = self.flow.get_flow()
+        print(f"""Values from the flow sensors: {f}""")
+        p = self.pt100s.get_temps()
+        print(f"""Values from the pt100s: {p}""")
+        print("all tests done.")
+
 
     def to_influx(self, db_name="teststand_1"):
         print("start writing to influx ...")

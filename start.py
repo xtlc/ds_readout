@@ -20,7 +20,7 @@ mux_dict = {1: {"uid": "0120211005135155", "comment": "mux_4kg_1", "number_of_sc
 def zero_all_scales():
     print("Executing zero_all_scales()...")
     from scales import Mux
-    s = Mux(device="ttyUSB1", uid="0020240425142741", number_of_scales=2, max_values=0, sleep_time=0)
+    s = Mux(device="ttyUSB0", uid="0020240425142741", number_of_scales=2, max_values=0, sleep_time=0)
     s.zero_all_scales()
 
 def to_terminal():
@@ -42,9 +42,10 @@ def to_terminal():
     print("Executing to_terminal()...")
 
 def to_influx():
-    m = Measurement(device_temp_usb="ttyUSB0", 
-                    device_scale_usb="ttyUSB1", 
+    m = Measurement(device_temp_usb="ttyUSB1", 
+                    device_scale_usb="ttyUSB0", 
                     pt100s={"in_ri": "0000006a2c70", "out_ri": "0000006ada1a", "in_le": "d5d3f91d64ff", "out_le": "a7d0f91d64ff"},
+                    #pt100s={"in_ri": "0000006a2c70", "out_ri": "0000006ada1a", "in_le": "0000006a2c70", "out_le": "a7d0f91d64ff"},
                     scale_uid="0020240425142741", 
                     device_flow_GPIOs=[12, 13], 
                     number_of_scales=2, 
