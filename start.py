@@ -17,13 +17,11 @@ bucket = env("BUCKET")
 #             2: {"uid": "0120211005135902", "comment": "mux_4kg_2", "number_of_scales": 8},
 #             3: {"uid": "0020240425142741", "comment": "mux_8kg_1", "number_of_scales": 4},}  
 # 
-PT100s = {"in_ri": "0000006a2c70", "out_ri": "0000006ada1a", "in_le": "d5d3f91d64ff", "out_le": "a7d0f91d64ff"},
+DS18B20s = {"in_ri": "0000006a2c70", "out_ri": "0000006ada1a", "in_le": "d5d3f91d64ff", "out_le": "a7d0f91d64ff"}
 USB_TEMP = "ttyUSB1"
 USB_SCALE = "ttyUSB0"
 FLOW_GPIOs = [12, 13]
 MUX = "0020240425142741"
-
-
 
 def zero_all_scales():
     print("Executing zero_all_scales()...")
@@ -34,7 +32,7 @@ def zero_all_scales():
 def to_terminal():
     m = Measurement(device_temp_usb=USB_TEMP, 
                     device_scale_usb=USB_SCALE, 
-                    pt100s=PT100s,
+                    pt100s=DS18B20s,
                     scale_uid=MUX, 
                     device_flow_GPIOs=FLOW_GPIOs, 
                     number_of_scales=2, 
@@ -52,7 +50,7 @@ def to_terminal():
 def to_influx():
     m = Measurement(device_temp_usb=USB_TEMP, 
                     device_scale_usb=USB_SCALE, 
-                    pt100s=PT100s,
+                    pt100s=DS18B20s,
                     scale_uid=MUX, 
                     device_flow_GPIOs=FLOW_GPIOs, 
                     number_of_scales=2, 
@@ -86,8 +84,10 @@ def main():
         to_terminal()
     elif args.option == 2:
         to_influx()
-    elif args.option == 3:
-        test()
+  #  elif args.option == 3:
+  #      test()
+    else:
+        print("no valid option was chosen.\n - 0 = zero scales\n - 1 = test output to terminal\n - 2 write to influx")
 
 if __name__ == "__main__":
     main()

@@ -53,14 +53,23 @@ class Measurement:
 
 
     def test(self):
+        print("starting up with some tests ...")
+       
         w = self.scales.get_all_weights()
         print(f"""Values from the scales: {w}""")
+        
         t = self.temps.get_all_temps()
         print(f"""Values from the ens210: {t}""")
+        if len(t) != 6: 
+            print(f"only {len(t)} temp/humidty/ens210 sensors were found - aborting!")
+            exit()
+        
         f = self.flow.get_flow()
         print(f"""Values from the flow sensors: {f}""")
+        
         p = self.pt100s.get_temps()
         print(f"""Values from the pt100s: {p}""")
+        
         print("all tests done.")
 
 
