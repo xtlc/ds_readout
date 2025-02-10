@@ -116,35 +116,36 @@ class Mux:
         values = self.muxread()
         return values.replace("#06", "")
 
-    def view_output(self, scale_values):
-        BOLD = "\033[1m"
-        RED = "\033[31m"
-        YELLOW = "\033[33m"
-        CYAN = "\033[36m"
-        BLUE = "\033[34m"
-        RESET = "\033[0m"
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
-        m = f"""0{len(str(self.MAX_VALUES))}"""
-        out = f"""{self.COUNTER:{m}} / {self.MAX_VALUES:{m}} - scales: """
-        if self.SCALES == 8:
-            scale_string = "  |  ".join([f"""{BOLD}{RED}{key}:{RESET} {scale_values[key]}kg""" for key in scale_values.keys() if key not in ["mux", "timestamp"]])
-        elif self.SCALES == 4:
-            # Convert keys to a list for slicing
-            keys_list = list(scale_values.keys())
-            t = []
-            for idx, key in enumerate(keys_list):
-                if idx < 4:
-                    t.append(f"""{BOLD}{RED}{key}:{RESET} {float(scale_values[key]):06.3f}kg""")
-                else:
-                    t.append(f"""{BOLD}{CYAN}{key}:{RESET} {float(scale_values[key]):06.2f}°C""")
-            scale_string = "  |  ".join(t)
-        else:
-            print("just printing the output:", scale_values)
-
-
-        print(f"""\r{out}{scale_string}""", end="")
-        
-        if self.COUNTER == self.MAX_VALUES:
-            return
-
+    #def view_output(self, scale_values):
+    #    BOLD = "\033[1m"
+    #    RED = "\033[31m"
+    #    YELLOW = "\033[33m"
+    #    CYAN = "\033[36m"
+    #    BLUE = "\033[34m"
+    #    RESET = "\033[0m"
+    #    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    #    
+    #    m = f"""0{len(str(self.MAX_VALUES))}"""
+    #    out = f"""{self.COUNTER:{m}} / {self.MAX_VALUES:{m}} - scales: """
+    #    if self.SCALES == 8:
+    #        scale_string = "  |  ".join([f"""{BOLD}{RED}{key}:{RESET} {scale_values[key]}kg""" for key in scale_values.keys() if key not in ["mux", "timestamp"]])
+    #    elif self.SCALES == 4:
+    #        # Convert keys to a list for slicing
+    #        keys_list = list(scale_values.keys())
+    #        t = []
+    #        for idx, key in enumerate(keys_list):
+    #            if idx < 4:
+    #                t.append(f"""{BOLD}{RED}{key}:{RESET} {float(scale_values[key]):06.3f}kg""")
+    #            else:
+    #                t.append(f"""{BOLD}{CYAN}{key}:{RESET} {float(scale_values[key]):06.2f}°C""")
+    #        scale_string = "  |  ".join(t)
+    #    else:
+    #        print("just printing the output:", scale_values)
+    #
+    #
+    #    print(f"""\r{out}{scale_string}""", end="")
+    #    
+    #    if self.COUNTER == self.MAX_VALUES:
+    #        return
+    #
+    #

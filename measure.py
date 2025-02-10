@@ -29,17 +29,22 @@ class Measurement:
         if device_scale_usb:
             self.scales = Mux(device=device_scale_usb, uid=scale_uid, number_of_scales=number_of_scales, max_values=measurements, sleep_time=sleep_time)
             self.number_of_scales = number_of_scales
+        
         if device_temp_usb:
             self.temps = Temp(device=device_temp_usb)
+        
         if device_flow_GPIOs:
             self.flow = Flow(FLOW_SENSOR_GPIO_RIGHT=device_flow_GPIOs[0], FLOW_SENSOR_GPIO_LEFT=device_flow_GPIOs[1],)
+        
         if pt100s != None:
             self.pt100s = PT100(PT100_WATER_IN_RIGHT=pt100s["in_ri"], PT100_WATER_OUT_RIGHT=pt100s["out_ri"], PT100_WATER_IN_LEFT=pt100s["in_le"], PT100_WATER_OUT_LEFT=pt100s["out_le"])
+        
         if cam:
             self.cam = Cam(resolution=[1920, 1080], filetype="jpeg")
 
         if ircam:
             self.ircam = IRCam()
+        
         if host:
             self.client = InfluxDBClient(url=host, token=token, org=org)
             self.bucket = bucket
