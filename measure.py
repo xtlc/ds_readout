@@ -56,7 +56,6 @@ class Measurement:
         # Initialize colorama
         colorama.init()
 
-
     def test(self):
         print("starting up with some tests ...")
        
@@ -76,7 +75,6 @@ class Measurement:
         print(f"""Values from the pt100s: {p}""")
         
         print("all tests done.")
-
 
     def to_influx(self, db_name="teststand_1"):
         print("start writing to influx ...")
@@ -255,7 +253,6 @@ class Measurement:
                 p = self.pt100s.get_temps()   
             else:
                 p = None
-                
 
             self.print_to_terminal(counter=counter, w=w, t=t, f=f, p=p)
             counter += 1

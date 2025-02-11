@@ -23,8 +23,7 @@ class PT100:
                 try:
                     values[name] =  float(data.split("t=")[1])/1000
                 except Exception as E:
-                    print("could not read pt100 values for", name, "because of:", E)
-                    return None
+                    values[name] =  float("nan")
         return values
                 
                 

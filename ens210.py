@@ -45,7 +45,10 @@ class Temp:
     
     def sanitize(self, readout):
         tmp = readout.split(" ")
-        return {"sensor": int(tmp[0]), "temp": float(tmp[1]), "humid": float(tmp[2])}
+        try:
+            return {"sensor": int(tmp[0]), "temp": float(tmp[1]), "humid": float(tmp[2])}
+        except Exception as E:
+            return {"sensor": int(tmp[0]), "temp": float("nan"), "humid": float("nan")}
 
 
 if __name__ == "__main__":
