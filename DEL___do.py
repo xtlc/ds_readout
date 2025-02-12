@@ -269,3 +269,78 @@ if __name__ == "__main__":
                     measurements=10, 
                     sleep_time=3, 
                     client=client).to_influx()
+
+
+
++sort(Stock!C1:C; NICHT(ISTLEER(Stock!C1:C)) * ZEILE(Stock!C1:C); FALSCH)
++sort(Stock!D1:D; NICHT(ISTLEER(Stock!D1:D)) * ZEILE(Stock!D1:D); FALSCH)
++sort(Stock!E1:E; NICHT(ISTLEER(Stock!E1:E)) * ZEILE(Stock!E1:E); FALSCH)
++sort(Stock!F1:F; NICHT(ISTLEER(Stock!F1:F)) * ZEILE(Stock!F1:F); FALSCH)
++sort(Stock!G1:G; NICHT(ISTLEER(Stock!G1:G)) * ZEILE(Stock!G1:G); FALSCH)
++sort(Stock!H1:H; NICHT(ISTLEER(Stock!H1:H)) * ZEILE(Stock!H1:H); FALSCH)
++sort(Stock!I1:I; NICHT(ISTLEER(Stock!I1:I)) * ZEILE(Stock!I1:I); FALSCH)
++sort(Stock!J1:J; NICHT(ISTLEER(Stock!J1:J)) * ZEILE(Stock!J1:J); FALSCH)
++sort(Stock!K1:K; NICHT(ISTLEER(Stock!K1:K)) * ZEILE(Stock!K1:K); FALSCH)
++sort(Stock!L1:L; NICHT(ISTLEER(Stock!L1:L)) * ZEILE(Stock!L1:L); FALSCH)
++sort(Stock!M1:M; NICHT(ISTLEER(Stock!M1:M)) * ZEILE(Stock!M1:M); FALSCH)
++sort(Stock!P1:P; NICHT(ISTLEER(Stock!P1:P)) * ZEILE(Stock!P1:P); FALSCH)
+
+1001 D
+=GANZZAHL(min(
+    +sort(Stock!C1:C; NICHT(ISTLEER(Stock!C1:C)) * ZEILE(Stock!C1:C); FALSCH);
+    +sort(Stock!D1:D; NICHT(ISTLEER(Stock!D1:D)) * ZEILE(Stock!D1:D); FALSCH);
+    +sort(Stock!H1:H; NICHT(ISTLEER(Stock!H1:H)) * ZEILE(Stock!H1:H); FALSCH)/B10; 
+    +sort(Stock!J1:J; NICHT(ISTLEER(Stock!J1:J)) * ZEILE(Stock!J1:J); FALSCH)/B12;
+    +sort(Stock!K1:K; NICHT(ISTLEER(Stock!K1:K)) * ZEILE(Stock!K1:K); FALSCH)/B13;
+    +sort(Stock!L1:L; NICHT(ISTLEER(Stock!L1:L)) * ZEILE(Stock!L1:L); FALSCH)/B20;
+    +sort(Stock!M1:M; NICHT(ISTLEER(Stock!M1:M)) * ZEILE(Stock!M1:M); FALSCH);
+    +sort(Stock!P1:P; NICHT(ISTLEER(Stock!P1:P)) * ZEILE(Stock!P1:P); FALSCH)
+))
+
+1002 E
+=GANZZAHL(min(
+    +sort(Stock!C1:C; NICHT(ISTLEER(Stock!C1:C)) * ZEILE(Stock!C1:C); FALSCH);
+    +sort(Stock!E1:E; NICHT(ISTLEER(Stock!E1:E)) * ZEILE(Stock!E1:E); FALSCH);
+    +sort(Stock!H1:H; NICHT(ISTLEER(Stock!H1:H)) * ZEILE(Stock!H1:H); FALSCH)/B10; 
+    +sort(Stock!J1:J; NICHT(ISTLEER(Stock!J1:J)) * ZEILE(Stock!J1:J); FALSCH)/B12;
+    +sort(Stock!K1:K; NICHT(ISTLEER(Stock!K1:K)) * ZEILE(Stock!K1:K); FALSCH)/B13;
+    +sort(Stock!L1:L; NICHT(ISTLEER(Stock!L1:L)) * ZEILE(Stock!L1:L); FALSCH)/B20;
+    +sort(Stock!M1:M; NICHT(ISTLEER(Stock!M1:M)) * ZEILE(Stock!M1:M); FALSCH);
+    +sort(Stock!P1:P; NICHT(ISTLEER(Stock!P1:P)) * ZEILE(Stock!P1:P); FALSCH)
+))
+
+1003 F
+=GANZZAHL(min(
+    +sort(Stock!C1:C; NICHT(ISTLEER(Stock!C1:C)) * ZEILE(Stock!C1:C); FALSCH);
+    +sort(Stock!F1:F; NICHT(ISTLEER(Stock!F1:F)) * ZEILE(Stock!F1:F); FALSCH);
+    +sort(Stock!H1:H; NICHT(ISTLEER(Stock!H1:H)) * ZEILE(Stock!H1:H); FALSCH)/B10; 
+    +sort(Stock!J1:J; NICHT(ISTLEER(Stock!J1:J)) * ZEILE(Stock!J1:J); FALSCH)/B12;
+    +sort(Stock!K1:K; NICHT(ISTLEER(Stock!K1:K)) * ZEILE(Stock!K1:K); FALSCH)/B13;
+    +sort(Stock!L1:L; NICHT(ISTLEER(Stock!L1:L)) * ZEILE(Stock!L1:L); FALSCH)/B20;
+    +sort(Stock!M1:M; NICHT(ISTLEER(Stock!M1:M)) * ZEILE(Stock!M1:M); FALSCH);
+    +sort(Stock!P1:P; NICHT(ISTLEER(Stock!P1:P)) * ZEILE(Stock!P1:P); FALSCH)
+))
+
+1004 G
+=GANZZAHL(min(
+    +sort(Stock!C1:C; NICHT(ISTLEER(Stock!C1:C)) * ZEILE(Stock!C1:C); FALSCH);
+    +sort(Stock!G1:G; NICHT(ISTLEER(Stock!G1:G)) * ZEILE(Stock!G1:G); FALSCH);
+    +sort(Stock!H1:H; NICHT(ISTLEER(Stock!H1:H)) * ZEILE(Stock!H1:H); FALSCH)/B10; 
+    +sort(Stock!J1:J; NICHT(ISTLEER(Stock!J1:J)) * ZEILE(Stock!J1:J); FALSCH)/B12;
+    +sort(Stock!K1:K; NICHT(ISTLEER(Stock!K1:K)) * ZEILE(Stock!K1:K); FALSCH)/B13;
+    +sort(Stock!L1:L; NICHT(ISTLEER(Stock!L1:L)) * ZEILE(Stock!L1:L); FALSCH)/B20;
+    +sort(Stock!M1:M; NICHT(ISTLEER(Stock!M1:M)) * ZEILE(Stock!M1:M); FALSCH);
+    +sort(Stock!P1:P; NICHT(ISTLEER(Stock!P1:P)) * ZEILE(Stock!P1:P); FALSCH)
+))
+
+1005
+=GANZZAHL(min(
+    +sort(Stock!C1:C; NICHT(ISTLEER(Stock!C1:C)) * ZEILE(Stock!C1:C); FALSCH);
+    +sort(Stock!F1:F; NICHT(ISTLEER(Stock!F1:F)) * ZEILE(Stock!F1:F); FALSCH);
+    +sort(Stock!H1:H; NICHT(ISTLEER(Stock!H1:H)) * ZEILE(Stock!H1:H); FALSCH)/B10; 
+    +sort(Stock!J1:J; NICHT(ISTLEER(Stock!J1:J)) * ZEILE(Stock!J1:J); FALSCH)/B12;
+    +sort(Stock!K1:K; NICHT(ISTLEER(Stock!K1:K)) * ZEILE(Stock!K1:K); FALSCH)/B13;
+    +sort(Stock!L1:L; NICHT(ISTLEER(Stock!L1:L)) * ZEILE(Stock!L1:L); FALSCH)/B20;
+    +sort(Stock!M1:M; NICHT(ISTLEER(Stock!M1:M)) * ZEILE(Stock!M1:M); FALSCH);
+    +sort(Stock!P1:P; NICHT(ISTLEER(Stock!P1:P)) * ZEILE(Stock!P1:P); FALSCH)
+))

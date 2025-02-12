@@ -24,10 +24,10 @@ class IRCam:
     # _colormap_list=['jet','bwr','seismic','coolwarm','PiYG_r','tab10','tab20','gnuplot2','brg']
     # _interpolation_list_name = ['Nearest','Inter Linear','Inter Area','Inter Cubic','Inter Lanczos4','Pure Scipy', 'Scipy/CV2 Mixed']
 
-    def __init__(self, image_width:int=1200, image_height:int=900):#, output_folder:str = '/home/pi/pithermalcam/saved_snapshots/'):
+    def __init__(self, image_width:int=1200, image_height:int=900, foldername="rclone"):#, output_folder:str = '/home/pi/pithermalcam/saved_snapshots/'):
         self.image_width=image_width
         self.image_height=image_height
-        self.output_folder=Path.cwd()
+        self.output_folder=Path.cwd().joinpath(foldername)
         self._setup_therm_cam()
         self._t0 = time.time()
         self.Tmin = 5

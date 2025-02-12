@@ -17,13 +17,12 @@ class PT100:
     def get_temps(self):
         values = {}
         for name, address in self.sensors.items():
-            # print("working on address", address)
-            with open(address, "r") as w1s:
-                data = w1s.read()
-                try:
+            try:
+                with open(address, "r") as w1s:
+                    data = w1s.read()
                     values[name] =  float(data.split("t=")[1])/1000
-                except Exception as E:
-                    values[name] =  float("nan")
+            except Exception as E:
+                values[name] = float("nan")
         return values
                 
                 

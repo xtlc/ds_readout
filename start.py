@@ -2,6 +2,11 @@ from environs import Env
 from measure import Measurement
 import argparse
 
+##### ENTER THE NAMES OF THE PANELS ######
+scale_left = "PREBATCH"
+scale_right = "CS32"
+
+
 # Initialize the environment & read env file
 env = Env()
 env.read_env()
@@ -22,6 +27,27 @@ USB_TEMP = "ttyUSB1"
 USB_SCALE = "ttyUSB0"
 FLOW_GPIOs = [12, 13]
 MUX = "0020240425142741"
+# ENS210s = {"top_left": 103, "bot_left": 100, "top_mid": 106, "bot_mid": 105, "top_right": 109, "top_left": 107}
+ENS210s = {"top_left": "g", "bot_left": "d", "top_mid": "j", "bot_mid": "i", "top_right": "m", "bot_right": "k"}
+
+## helper for the ENS210:
+#   100 -> d
+#   101 -> e
+#   102 -> f
+#   103 -> g
+#   104 -> h
+#   105 -> i
+#   106 -> j
+#   107 -> k
+#   108 -> l
+#   109 -> m
+#   110 -> n
+#   111 -> o
+#   112 -> p
+#   113 -> q
+#   114 -> r
+#   115 -> s
+
 
 def zero_all_scales():
     print("Executing zero_all_scales()...")
@@ -31,8 +57,11 @@ def zero_all_scales():
 
 def to_terminal():
     m = Measurement(device_temp_usb=USB_TEMP, 
-                    device_scale_usb=USB_SCALE, 
+                    device_scale_usb=USB_SCALE,  
+                    name_left=scale_left,
+                    name_right=scale_right,
                     pt100s=DS18B20s,
+                    ens210s=ENS210s,
                     scale_uid=MUX, 
                     device_flow_GPIOs=FLOW_GPIOs, 
                     number_of_scales=2, 
@@ -50,7 +79,10 @@ def to_terminal():
 def to_influx():
     m = Measurement(device_temp_usb=USB_TEMP, 
                     device_scale_usb=USB_SCALE, 
+                    name_left=scale_left,
+                    name_right=scale_right,
                     pt100s=DS18B20s,
+                    ens210s=ENS210s,
                     scale_uid=MUX, 
                     device_flow_GPIOs=FLOW_GPIOs, 
                     number_of_scales=2, 
@@ -62,7 +94,7 @@ def to_influx():
                     org=org,
                     ircam=True, 
                     cam=True)
-    m.to_influx()
+    m.to_influx(db_name="teststand_1")
     print("Executing to_influx()...")
 
 

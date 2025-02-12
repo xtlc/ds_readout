@@ -1,3 +1,8 @@
+Missing features
+ -> rsync to google cloud drive
+ -> Image description Left and right and timestamp in the picture
+
+
 The RS485 <--> USB tool used:  Hailege CP2102 USB zu TTL UART 232 485 Port Mutual Convert Adapter USB Serial Port Adapter 6 in One
 Link on Amazon: https://www.amazon.de/dp/B07XZ3PV8T/ref=sspa_dk_detail_0?psc=1&pd_rd_i=B07XZ3PV8T&pd_rd_w=DnQW7&content-id=amzn1.sym.6ffc9ff7-fa31-49da-8594-196e74bcf61e&pf_rd_p=6ffc9ff7-fa31-49da-8594-196e74bcf61e&pf_rd_r=556T3GB8N8YZ7T75E8N7&pd_rd_wg=pdoKq&pd_rd_r=1a8c8778-3020-4ff7-8df9-b70d796d49fb&s=industrial&sp_csd=d2lkZ2V0TmFtZT1zcF9kZXRhaWw
 
@@ -47,3 +52,6 @@ für onewirebus (pt100):
     cat w1_slave
 
     The contents of the w1_slave file will look something as shown in the next screenshot (first line contains the status of the reading: YES means a valid reading, and the second line shows the temperature (you need to divide by 1000 to get it in degrees Celsius).
+
+
+   
