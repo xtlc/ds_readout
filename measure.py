@@ -28,7 +28,8 @@ class Measurement:
                  bucket=None, 
                  cam=False,
                  ircam=False,
-                 org=None):
+                 org=None,
+                 foldername="rclone"):
 
         if name_left:
             self.scale_left = name_left
@@ -56,15 +57,18 @@ class Measurement:
             self.ens210s = ens210s
 
         if cam:
-            self.cam = Cam(resolution=[1920, 1080], filetype="jpeg")
+            self.cam = Cam(resolution=[1920, 1080], filetype="jpeg", foldername=foldername)
 
         if ircam:
-            self.ircam = IRCam()
+            self.ircam = IRCam(foldername=foldername)
         
         if host:
             self.client = InfluxDBClient(url=host, token=token, org=org)
             self.bucket = bucket
         self.wait_time = sleep_time ## seconds
+        
+        ## for rclone
+        self.foldername = foldername
 
         # initialize tests:
         self.test()

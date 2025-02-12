@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 
 class Cam:
-    def __init__(self, left_panel="L", right_panel="L", resolution=[1920, 1080], filetype="jpeg", foldername="rclone"):
+    def __init__(self, left_panel="L", right_panel="R", resolution=[1920, 1080], filetype="jpeg", foldername="rclone"):
         self.res_x = resolution[0]
         self.res_y = resolution[1]
         self.foldername = foldername

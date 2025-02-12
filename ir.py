@@ -12,14 +12,6 @@ import cmapy
 from scipy import ndimage
 from pathlib import Path
 
-# python -m pip install adafruit-circuitpython-mlx90640
-# python -m pip install numpy
-# python -m pip install scipy
-# python -m pip install cmapy
-# python -m pip install opencv-python
-
-
-
 class IRCam:
     # _colormap_list=['jet','bwr','seismic','coolwarm','PiYG_r','tab10','tab20','gnuplot2','brg']
     # _interpolation_list_name = ['Nearest','Inter Linear','Inter Area','Inter Cubic','Inter Lanczos4','Pure Scipy', 'Scipy/CV2 Mixed']

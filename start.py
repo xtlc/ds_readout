@@ -1,10 +1,16 @@
 from environs import Env
 from measure import Measurement
-import argparse
+import time
+import argparse, subprocess, threading
 
 ##### ENTER THE NAMES OF THE PANELS ######
 scale_left = "PREBATCH"
 scale_right = "CS32"
+
+#### for the remote saving of files #####
+foldername = "rclone"
+
+###################################################
 
 
 # Initialize the environment & read env file
@@ -71,6 +77,7 @@ def to_terminal():
                     token=token, 
                     bucket=bucket, 
                     org=org, 
+                    foldername=foldername,
                     ircam=False,
                     cam=False)
     m.to_terminal()
@@ -92,10 +99,30 @@ def to_influx():
                     token=token, 
                     bucket=bucket, 
                     org=org,
+                    foldername=foldername,
                     ircam=True, 
                     cam=True)
     m.to_influx(db_name="teststand_1")
     print("Executing to_influx()...")
+
+def start_rclone(foldername="rclone"):
+    cmd = ["rclone", "copy", f"""gdrive:00_Entwicklung\ und\ Forschung/100_Klimakammer/teststand_1""", f"""/home/rabaton/Desktop/ds_readout/{foldername}/""", "-v"]
+    while True:
+        try:
+            # Use Popen to run rclone in the background
+            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = process.communicate()  # Wait for the command to complete
+            
+            if stdout:
+                print(stdout.decode().strip())
+            if stderr:
+                print(stderr.decode().strip())
+            
+            print("rclone copied files ...")
+        except Exception as e:
+            print(f"Error running rclone: {e}")
+        
+        time.sleep(10)  # Wait for 10 seconds before the next sync
 
 
 
@@ -104,7 +131,7 @@ def main():
     parser = argparse.ArgumentParser(description="Choose an option to execute a function.")
 
     # Add a command-line argument for the option
-    parser.add_argument("option", type=int, choices=[0, 1, 2], help="Choose an option: 0 for zero_all_scales, 1 for to_terminal, 2 for to_influx")
+    parser.add_argument("option", type=int, choices=[0, 1, 2, 3], help="Choose an option: 0 for zero_all_scales, 1 for to_terminal, 2 for to_influx")
 
     # Parse the arguments
     args = parser.parse_args()
@@ -115,9 +142,17 @@ def main():
     elif args.option == 1:
         to_terminal()
     elif args.option == 2:
-        to_influx()
-  #  elif args.option == 3:
-  #      test()
+        thread_rclone = threading.Thread(target=start_rclone, args=(foldername,))
+        thread_influx = threading.Thread(target=to_influx, args=())
+        thread_rclone.start()
+        thread_influx.start()
+        thread_rclone.join()
+        thread_influx.join()
+    elif args.option == 3:
+        thread_rclone = threading.Thread(target=start_rclone, args=(foldername,))
+        thread_rclone.start()
+        # thread_rclone.join()
+
     else:
         print("no valid option was chosen.\n - 0 = zero scales\n - 1 = test output to terminal\n - 2 write to influx")
 
