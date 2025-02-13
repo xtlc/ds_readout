@@ -88,10 +88,10 @@ class IRCam:
 
         # Draw the text on the color scale
         cv2.putText(color_scale, f"{self.Tmin}",    (0, 30),    cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
-        cv2.putText(color_scale, f"10",             (280, 30),    cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
-        cv2.putText(color_scale, f"20",             (580, 30),    cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
-        cv2.putText(color_scale, f"30",             (880, 30),    cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
-        cv2.putText(color_scale, f"{self.Tmax}",    (1170, 30),    cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.putText(color_scale, f"10",             (280, 30),  cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.putText(color_scale, f"20",             (580, 30),  cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.putText(color_scale, f"30",             (880, 30),  cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.putText(color_scale, f"{self.Tmax}",    (1170, 30), cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
 
         return color_scale
 
@@ -112,7 +112,9 @@ class IRCam:
     
     def _process_raw_image(self):
         self._image = ndimage.zoom(self._raw_image, 25)  # interpolate with scipy
-        self._image = cv2.applyColorMap(self._image, cmapy.cmap("jet"))
+        self._image = np.clip(self._image, 0, 255) # clip values to be in range [0 ... 255]
+        self._image = self._image.astype(np.uint8) #convert to uint8
+        self._image = cv2.applyColorMap(self._image, cv2.COLORMAP_JET)
         self._image = cv2.flip(self._image, 1)
 
 irc = IRCam()

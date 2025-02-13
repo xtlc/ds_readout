@@ -1,16 +1,13 @@
 from environs import Env
-from measure import Measurement
-import time
 import argparse, subprocess, threading
 
 ##### ENTER THE NAMES OF THE PANELS ######
 scale_left = "PREBATCH"
-scale_right = "CS32"
+scale_right = "CS9"
 
-#### for the remote saving of files #####
+##### for the remote saving of files ##### THIS FOLDER MUST EXIST BEFORE START #####
 foldername = "rclone"
-
-###################################################
+####################################################################################
 
 
 # Initialize the environment & read env file
@@ -27,7 +24,7 @@ bucket = env("BUCKET")
 # mux_dict = {1: {"uid": "0120211005135155", "comment": "mux_4kg_1", "number_of_scales": 8}, 
 #             2: {"uid": "0120211005135902", "comment": "mux_4kg_2", "number_of_scales": 8},
 #             3: {"uid": "0020240425142741", "comment": "mux_8kg_1", "number_of_scales": 4},}  
-# 
+ 
 DS18B20s = {"in_ri": "0000006a2c70", "out_ri": "0000006ada1a", "in_le": "d5d3f91d64ff", "out_le": "a7d0f91d64ff"}
 USB_TEMP = "ttyUSB1"
 USB_SCALE = "ttyUSB0"
@@ -37,23 +34,8 @@ MUX = "0020240425142741"
 ENS210s = {"top_left": "g", "bot_left": "d", "top_mid": "j", "bot_mid": "i", "top_right": "m", "bot_right": "k"}
 
 ## helper for the ENS210:
-#   100 -> d
-#   101 -> e
-#   102 -> f
-#   103 -> g
-#   104 -> h
-#   105 -> i
-#   106 -> j
-#   107 -> k
-#   108 -> l
-#   109 -> m
-#   110 -> n
-#   111 -> o
-#   112 -> p
-#   113 -> q
-#   114 -> r
-#   115 -> s
-
+#   100 -> d    101 -> e    102 -> f    103 -> g    104 -> h    105 -> i    106 -> j    107 -> k    108 -> l    109 -> m    110 -> n
+#   111 -> o    112 -> p    113 -> q    114 -> r    115 -> s
 
 def zero_all_scales():
     print("Executing zero_all_scales()...")
@@ -62,6 +44,7 @@ def zero_all_scales():
     s.zero_all_scales()
 
 def to_terminal():
+    from measure import Measurement
     m = Measurement(device_temp_usb=USB_TEMP, 
                     device_scale_usb=USB_SCALE,  
                     name_left=scale_left,
@@ -84,6 +67,7 @@ def to_terminal():
     print("Executing to_terminal()...")
 
 def to_influx():
+    from measure import Measurement
     m = Measurement(device_temp_usb=USB_TEMP, 
                     device_scale_usb=USB_SCALE, 
                     name_left=scale_left,
@@ -106,25 +90,12 @@ def to_influx():
     print("Executing to_influx()...")
 
 def start_rclone(foldername="rclone"):
-    cmd = ["rclone", "copy", f"""gdrive:00_Entwicklung\ und\ Forschung/100_Klimakammer/teststand_1""", f"""/home/rabaton/Desktop/ds_readout/{foldername}/""", "-v"]
-    while True:
-        try:
-            # Use Popen to run rclone in the background
-            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            stdout, stderr = process.communicate()  # Wait for the command to complete
-            
-            if stdout:
-                print(stdout.decode().strip())
-            if stderr:
-                print(stderr.decode().strip())
-            
-            print("rclone copied files ...")
-        except Exception as e:
-            print(f"Error running rclone: {e}")
-        
-        time.sleep(10)  # Wait for 10 seconds before the next sync
-
-
+    cmd = ["rclone", "sync", f"""/home/rabaton/Desktop/ds_readout/{foldername}/""", f"""gdrive:00_Entwicklung und Forschung/100_Klimakammer/teststand_1/""", "-vv"]
+    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    print("STDOUT:", result.stdout)
+    print("STDERR:", result.stderr)
+    print("syncing done")
+    return True
 
 def main():
     # Create the parser
@@ -142,19 +113,13 @@ def main():
     elif args.option == 1:
         to_terminal()
     elif args.option == 2:
-        thread_rclone = threading.Thread(target=start_rclone, args=(foldername,))
         thread_influx = threading.Thread(target=to_influx, args=())
-        thread_rclone.start()
         thread_influx.start()
-        thread_rclone.join()
         thread_influx.join()
     elif args.option == 3:
-        thread_rclone = threading.Thread(target=start_rclone, args=(foldername,))
-        thread_rclone.start()
-        # thread_rclone.join()
-
+        start_rclone(foldername=foldername)
     else:
-        print("no valid option was chosen.\n - 0 = zero scales\n - 1 = test output to terminal\n - 2 write to influx")
+        print("no valid option was chosen.\n - 0 = zero scales\n - 1 = test output to terminal\n - 2 write to influx\n - rclone")
 
 if __name__ == "__main__":
     main()
