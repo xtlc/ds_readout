@@ -6,8 +6,6 @@ from scales import Mux
 from ens210 import Temp
 from pt100 import PT100
 from flow import Flow
-from cam import Cam
-from ir import IRCam
 import colorama
 
 class Measurement:
@@ -57,10 +55,12 @@ class Measurement:
             self.ens210s = ens210s
 
         if cam:
+            from cam import Cam
             self.cam = Cam(resolution=[1920, 1080], filetype="jpeg", foldername=foldername)
 
         if ircam:
-            self.ircam = IRCam(foldername=foldername)
+            from ir import IRCam
+            self.ircam = IRCam(foldername=foldername, name_left=name_left, name_right=name_right)
         
         if host:
             self.client = InfluxDBClient(url=host, token=token, org=org)
@@ -118,37 +118,37 @@ class Measurement:
 
             ## scale values
             try:
-                p_01 = Point(db_name).field(self.scale_left, float(w["00"]) * 1000, ).time(now)
+                p_01 = Point(db_name).field(f"{self.scale_left}_left", float(w["00"]) * 1000, ).time(now)
             except IndexError as E:
-                p_01 = Point(db_name).field(self.scale_left, float('nan')).time(now)
+                p_01 = Point(db_name).field(f"{self.scale_left}_left", float('nan')).time(now)
             try:
-                p_02 = Point(db_name).field(self.scale_right, float(w["01"]) * 1000, ).time(now)
+                p_02 = Point(db_name).field(f"{self.scale_right}_right", float(w["01"]) * 1000, ).time(now)
             except IndexError as E:
-                p_02 = Point(db_name).field(self.scale_right, float('nan')).time(now)
+                p_02 = Point(db_name).field(f"{self.scale_right}_right", float('nan')).time(now)
             
             ## temperature values
-            p_03 = Point(db_name).field(f"temp_{self.scale_left}_bot", t["temp_bot_left"]).time(now)
-            p_04 = Point(db_name).field(f"humid_{self.scale_left}_bot", t["humid_bot_left"]).time(now)
-            p_05 = Point(db_name).field(f"temp_{self.scale_left}_top", t["temp_top_left"]).time(now)
-            p_06 = Point(db_name).field(f"humid_{self.scale_left}_top", t["humid_top_left"]).time(now)
+            p_03 = Point(db_name).field(f"temp_scale_left_bot", t["temp_bot_left"]).time(now)
+            p_04 = Point(db_name).field(f"humid_scale_left_bot", t["humid_bot_left"]).time(now)
+            p_05 = Point(db_name).field(f"temp_scale_left_top", t["temp_top_left"]).time(now)
+            p_06 = Point(db_name).field(f"humid_scale_left_top", t["humid_top_left"]).time(now)
             p_07 = Point(db_name).field(f"temp_mid_bot", t["temp_bot_mid"]).time(now)
             p_08 = Point(db_name).field(f"humid_mid_bot", t["humid_bot_mid"]).time(now)
             p_09 = Point(db_name).field(f"temp_mid_top", t["temp_top_mid"]).time(now)
             p_10 = Point(db_name).field(f"humid_mid_top", t["humid_top_mid"]).time(now)
-            p_11 = Point(db_name).field(f"temp_{self.scale_right}_bot", t["temp_bot_right"]).time(now)
-            p_12 = Point(db_name).field(f"humid_{self.scale_right}_bot", t["humid_bot_right"]).time(now)
-            p_13 = Point(db_name).field(f"temp_{self.scale_right}_top", t["temp_top_right"]).time(now)
-            p_14 = Point(db_name).field(f"humid_{self.scale_right}_top", t["humid_top_right"]).time(now)
+            p_11 = Point(db_name).field(f"temp_scale_right_bot", t["temp_bot_right"]).time(now)
+            p_12 = Point(db_name).field(f"humid_scale_right_bot", t["humid_bot_right"]).time(now)
+            p_13 = Point(db_name).field(f"temp_scale_right_top", t["temp_top_right"]).time(now)
+            p_14 = Point(db_name).field(f"humid_scale_right_top", t["humid_top_right"]).time(now)
             
             ## flow values
-            p_15 = Point(db_name).field(f"flow_{self.scale_left}", float(f["flow_left"])).time(now)
-            p_16 = Point(db_name).field(f"flow_{self.scale_right}", float(f["flow_right"])).time(now)
+            p_15 = Point(db_name).field(f"flow_left", float(f["flow_left"])).time(now)
+            p_16 = Point(db_name).field(f"flow_right", float(f["flow_right"])).time(now)
              
             ## pt100 values
-            p_17 = Point(db_name).field(f"water_temp_{self.scale_right}_in",  float(p["in_ri"])).time(now)
-            p_18 = Point(db_name).field(f"water_temp_{self.scale_right}_out", float(p["out_ri"])).time(now)
-            p_19 = Point(db_name).field(f"water_temp_{self.scale_left}_in", float(p["in_le"])).time(now)
-            p_20 = Point(db_name).field(f"water_temp_{self.scale_left}_out", float(p["out_le"])).time(now)
+            p_17 = Point(db_name).field(f"water_temp_right_in",  float(p["in_ri"])).time(now)
+            p_18 = Point(db_name).field(f"water_temp_right_out", float(p["out_ri"])).time(now)
+            p_19 = Point(db_name).field(f"water_temp_left_in", float(p["in_le"])).time(now)
+            p_20 = Point(db_name).field(f"water_temp_left_out", float(p["out_le"])).time(now)
            
             records = [p_01, p_02, p_03, p_04, p_05, p_06, p_07, p_08, p_09, p_10, p_11, p_12, p_13, p_14, p_15, p_16, p_17, p_18, p_19, p_20]
             

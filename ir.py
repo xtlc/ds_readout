@@ -6,17 +6,14 @@
 import time, board, busio
 import numpy as np
 import adafruit_mlx90640
-import datetime as dt
+from datetime import datetime
 import cv2
 import cmapy
 from scipy import ndimage
 from pathlib import Path
 
 class IRCam:
-    # _colormap_list=['jet','bwr','seismic','coolwarm','PiYG_r','tab10','tab20','gnuplot2','brg']
-    # _interpolation_list_name = ['Nearest','Inter Linear','Inter Area','Inter Cubic','Inter Lanczos4','Pure Scipy', 'Scipy/CV2 Mixed']
-
-    def __init__(self, image_width:int=1200, image_height:int=900, foldername="rclone"):#, output_folder:str = '/home/pi/pithermalcam/saved_snapshots/'):
+    def __init__(self, image_width:int=1200, image_height:int=900, foldername="rclone", name_left=None, name_right=None):#, output_folder:str = '/home/pi/pithermalcam/saved_snapshots/'):
         self.image_width=image_width
         self.image_height=image_height
         self.output_folder=Path.cwd().joinpath(foldername)
@@ -24,6 +21,8 @@ class IRCam:
         self._t0 = time.time()
         self.Tmin = 5
         self.Tmax = 30
+        self.name_left = name_left
+        self.name_right = name_right
 
     def _setup_therm_cam(self):
         """Initialize the thermal camera"""
@@ -64,9 +63,12 @@ class IRCam:
         
         # Combine the thermal image and the color scale
         combined_image = self._combine_images(self._image, color_scale)
+
+        # add captures
+        img_with_catpures = self._add_captures(img=combined_image)
         
-        fname = self.output_folder.joinpath(f"""IR_{dt.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.jpg""")
-        cv2.imwrite(fname, combined_image)
+        fname = self.output_folder.joinpath(f"""IR_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.jpg""")
+        cv2.imwrite(fname, img_with_catpures)
         print("Thermal Image ", fname, "saved")
 
     def _create_color_scale(self):
@@ -87,13 +89,35 @@ class IRCam:
         color_scale = cv2.resize(color_scale, (1200, 50))  # Width: 800px, Height: 50px
 
         # Draw the text on the color scale
-        cv2.putText(color_scale, f"{self.Tmin}",    (0, 30),    cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
-        cv2.putText(color_scale, f"10",             (280, 30),  cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
-        cv2.putText(color_scale, f"20",             (580, 30),  cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
-        cv2.putText(color_scale, f"30",             (880, 30),  cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
-        cv2.putText(color_scale, f"{self.Tmax}",    (1170, 30), cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.putText(color_scale, f"{self.Tmin}", (0, 30),    cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.putText(color_scale, f"10",          (280, 30),  cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.putText(color_scale, f"20",          (580, 30),  cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.putText(color_scale, f"30",          (880, 30),  cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.putText(color_scale, f"{self.Tmax}", (1170, 30), cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
 
         return color_scale
+
+    def _add_captures(self, img):
+        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Get the dimensions of the image
+        height, width, _ = img.shape
+
+        # Get the size of the text to be added
+        now_size = cv2.getTextSize(now, cv2.FONT_HERSHEY_DUPLEX, 1, 2)[0]
+        
+        # Calculate the position for the text to be centered
+        now_x = (width - now_size[0]) // 2
+
+        # Add the text to the image
+        cv2.putText(img, now, (now_x, 30), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+
+        # adding names
+        if self.name_left and self.name_right:
+            cv2.putText(img, self.name_left, (10, 30), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+            cv2.putText(img, self.name_right, (width - 10 - cv2.getTextSize(self.name_right, cv2.FONT_HERSHEY_DUPLEX, 1, 2)[0][0], 30), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+
+        return img
 
     def _combine_images(self, thermal_image, color_scale):
         """Combine the thermal image with the horizontal color scale."""

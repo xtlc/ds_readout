@@ -31,7 +31,7 @@ class Cam:
         bbox_timestamp = draw.textbbox((0, 0), timestamp, font=font)  # Get the bounding box of the text
         timestamp_size = bbox_timestamp[2] - bbox_timestamp[0]  # Width of the text
 
-        bbox_right = draw.textbbox((0, 0), self.right_panel, font=font)  # Get the bounding box of the text
+        bbox_right = draw.textbbox((0, 0), f"{self.right_panel}_right", font=font)  # Get the bounding box of the text
         right_panel_size = bbox_right[2] - bbox_right[0]
         
         pos_l = (10, 20)
@@ -39,9 +39,9 @@ class Cam:
         pos_r = ((self.res_x - right_panel_size) -10 , 20)  # Centered at the top
 
         # Add the timestamp to the image
-        draw.text(pos_l, self.left_panel, fill="red", font=font)
+        draw.text(pos_l, f"{self.left_panel}_left", fill="red", font=font)
         draw.text(pos_m, timestamp, fill="red", font=font)
-        draw.text(pos_r, self.right_panel, fill="red", font=font)
+        draw.text(pos_r, f"{self.right_panel}_right", fill="red", font=font)
 
         # Save the modified image
         image.save(f"{self.foldername}/{filename}.{self.filetype}")
