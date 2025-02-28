@@ -25,8 +25,6 @@ class Mux:
 
     def create_port(self, ):
         port = get_port(devicetype="scale")
-        print("PORT returned", port)
-        exit()
         self.ser = Serial(port=port, 
                           baudrate=9600, 
                           bytesize=EIGHTBITS, 
@@ -117,3 +115,5 @@ class Mux:
 
 if __name__ == "__main__":
     mux = Mux()
+    r = mux.get_revision()
+    print("test successful, revision of the mux:", r)
