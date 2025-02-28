@@ -16,6 +16,7 @@ class Measurement:
                  name_right=None,
                  pt100s=None,
                  ens210s=None,
+                 device_flow_GPIOs=None,
                  measurements=0, 
                  sleep_time=60, 
                  cam=False,

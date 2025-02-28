@@ -117,3 +117,4 @@ if __name__ == "__main__":
     mux = Mux()
     r = mux.get_revision()
     print("test successful, revision of the mux:", r)
+    # mux.zero_all_scales()
