@@ -36,7 +36,7 @@ ENS210s = {"top_left": "g", "bot_left": "d", "top_mid": "j", "bot_mid": "i", "to
 def zero_all_scales():
     print("Executing zero_all_scales()...")
     from scales import Mux
-    s = Mux(device=USB_SCALE, uid=MUX, number_of_scales=2, max_values=0, sleep_time=0)
+    s = Mux()
     s.zero_all_scales()
 
 def to_terminal():
