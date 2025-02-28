@@ -47,11 +47,13 @@ class Measurement:
             self.scales = Mux(max_values=measurements, sleep_time=sleep_time)
         except Exception as E:
             print(f"scales could not be initialized, aborting")
+            exit()
         
         try:
-           self.temps = Temp(device=device_temp_usb, sensors=ens210s)
+           self.temps = Temp(sensors=ens210s)
         except Exception as E:
             print(f"ens210 could not be initialized, aborting")
+            exit()
         
         if device_flow_GPIOs:
             self.flows = Flow(FLOW_SENSOR_GPIO_RIGHT=device_flow_GPIOs[0], FLOW_SENSOR_GPIO_LEFT=device_flow_GPIOs[1],)

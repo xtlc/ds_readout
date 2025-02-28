@@ -4,11 +4,9 @@ from usbports import get_port
 
 class Temp:
     def __init__(self, sensors):
-        # self.dev = f"""/dev/{device}""" ##f os.name == "nt": dev = f"""{self.DEVICE}"""
         self.create_port()
         self.CR = "\x0D"
         self.sensors = sensors
-        # sensors = {"top_left": "g", "bot_left": "d", "top_mid": "j", "bot_mid": "i", "top_right": "m", "bot_right": "k"}
 
     def create_port(self, ):
         p = get_port(devicetype="temp")
@@ -44,7 +42,7 @@ class Temp:
 
 if __name__ == "__main__":
     ENS210s = {"top_left": "g", "bot_left": "d", "top_mid": "j", "bot_mid": "i", "top_right": "m", "bot_right": "k"}
-    t = Temp(device="ttyUSB1", sensors=ENS210s)
+    t = Temp(sensors=ENS210s)
     while True:
         print(t.get_all_temps())
         time.sleep(1)
