@@ -104,7 +104,7 @@ class Mux:
             print(f"""scale {channel} was not calibrated""")
 
     def zero_all_scales(self):
-        for i in range(self.SCALES):
+        for i in [0, 1]:
             self.zero_scale(channel=i)
         
     def get_revision(self):
