@@ -12,13 +12,8 @@ class Measurement:
     def __init__(self, 
                  name_left=None,
                  name_right=None,
-                 device_temp_usb=None,
-                 device_flow_GPIOs=None, 
-                 device_scale_usb=None, 
                  pt100s=None,
                  ens210s=None,
-                 scale_uid=None, 
-                 number_of_scales=0, 
                  measurements=0, 
                  sleep_time=60, 
                  host=None,
@@ -39,8 +34,7 @@ class Measurement:
             self.scale_right = "scale_right"
 
         if device_scale_usb:
-            self.scales = Mux(device=device_scale_usb, uid=scale_uid, number_of_scales=number_of_scales, max_values=measurements, sleep_time=sleep_time)
-            self.number_of_scales = number_of_scales
+            self.scales = Mux(max_values=measurements, sleep_time=sleep_time)
         
         if device_temp_usb:
             self.temps = Temp(device=device_temp_usb, sensors=ens210s)
@@ -177,25 +171,24 @@ class Measurement:
                 formatted_value = f"""{v:>{total_width}.3f}"""
             return f"""{formatted_value}"""
 
-        if self.number_of_scales == 2:
-            head = f"\n\033[33mw_{self.scale_left}\033[39m | \033[33mw_{self.scale_right}\033[39m | \033[31mt_{self.scale_left}_top\033[39m | \033[31mt_{self.scale_left}_bot\033[39m | \033[31mt_mid_top\033[39m  | \033[31mt_mid_bot\033[39m  | \033[31mt_{self.scale_right}_top\033[39m | \033[31mt_{self.scale_right}_bot\033[39m "
-            head += f"| \033[36mh_{self.scale_left}_top\033[39m | \033[36mh_{self.scale_left}_bot\033[39m | \033[36mh_mid_top\033[39m  | \033[36mh_mid_bot\033[39m | \033[36mh_{self.scale_right}_top\033[39m | \033[36mh_{self.scale_right}_bot\033[39m | \033[35mflow_{self.scale_left}\033[39m | \033[35mflow_{self.scale_right}\033[39m | "
-            head += f"\033[93mwtr_in_{self.scale_left}\033[39m | \033[93mwtr_out_{self.scale_left}\033[39m | \033[93mwtr_in_{self.scale_right}\033[39m | \033[93mwtr_out_{self.scale_right}\033[39m | \n"
-            head += f"-" * 276
-            
-            print(t)
+        head = f"\n\033[33mw_{self.scale_left}\033[39m | \033[33mw_{self.scale_right}\033[39m | \033[31mt_{self.scale_left}_top\033[39m | \033[31mt_{self.scale_left}_bot\033[39m | \033[31mt_mid_top\033[39m  | \033[31mt_mid_bot\033[39m  | \033[31mt_{self.scale_right}_top\033[39m | \033[31mt_{self.scale_right}_bot\033[39m "
+        head += f"| \033[36mh_{self.scale_left}_top\033[39m | \033[36mh_{self.scale_left}_bot\033[39m | \033[36mh_mid_top\033[39m  | \033[36mh_mid_bot\033[39m | \033[36mh_{self.scale_right}_top\033[39m | \033[36mh_{self.scale_right}_bot\033[39m | \033[35mflow_{self.scale_left}\033[39m | \033[35mflow_{self.scale_right}\033[39m | "
+        head += f"\033[93mwtr_in_{self.scale_left}\033[39m | \033[93mwtr_out_{self.scale_left}\033[39m | \033[93mwtr_in_{self.scale_right}\033[39m | \033[93mwtr_out_{self.scale_right}\033[39m | \n"
+        head += f"-" * 276
+        
+        print(t)
 
-            if counter % 10 == 0:
-                print(head)
-            out = ""
-            out += f"""\033[33m{my_format(w["00"])}\033[39m |  \033[33m{my_format(w["01"])}\033[36m | """
+        if counter % 10 == 0:
+            print(head)
+        out = ""
+        out += f"""\033[33m{my_format(w["00"])}\033[39m |  \033[33m{my_format(w["01"])}\033[36m | """
 
-            out += f"""\033[31m{my_format(t["temp_top_left"])}\033[39m | \033[31m{my_format(t["temp_bot_left"])}\033[39m | \033[31m{my_format(t["temp_top_mid"])}\033[39m | \033[31m{my_format(t["temp_bot_mid"])}\033[39m |  \033[31m{my_format(t["temp_top_right"])}\033[39m |  \033[31m{my_format(t["temp_bot_right"])}\033[39m | """
-            out += f"""\033[36m{my_format(t["humid_top_left"])}\033[39m | \033[36m{my_format(t["humid_bot_left"])}\033[39m | \033[36m{my_format(t["humid_bot_mid"])}\033[39m | \033[36m{my_format(t["humid_bot_mid"])}\033[39m | \033[36m{my_format(t["humid_top_right"])}\033[39m | \033[36m{my_format(t["humid_bot_right"])}\033[39m | """
+        out += f"""\033[31m{my_format(t["temp_top_left"])}\033[39m | \033[31m{my_format(t["temp_bot_left"])}\033[39m | \033[31m{my_format(t["temp_top_mid"])}\033[39m | \033[31m{my_format(t["temp_bot_mid"])}\033[39m |  \033[31m{my_format(t["temp_top_right"])}\033[39m |  \033[31m{my_format(t["temp_bot_right"])}\033[39m | """
+        out += f"""\033[36m{my_format(t["humid_top_left"])}\033[39m | \033[36m{my_format(t["humid_bot_left"])}\033[39m | \033[36m{my_format(t["humid_bot_mid"])}\033[39m | \033[36m{my_format(t["humid_bot_mid"])}\033[39m | \033[36m{my_format(t["humid_top_right"])}\033[39m | \033[36m{my_format(t["humid_bot_right"])}\033[39m | """
 
-            out += f"""\033[35m{my_format(f["flow_left"])}\033[39m | \033[35m{my_format(f["flow_right"])}\033[39m | """
-            out += f"""\033[93m{my_format(p["in_le"])}\033[39m | \033[93m{my_format(p["out_le"])}\033[39m | \033[93m{my_format(p["in_ri"])}\033[39m | \033[93m{my_format(p["out_ri"])}\033[39m |"""
-            print(out)
+        out += f"""\033[35m{my_format(f["flow_left"])}\033[39m | \033[35m{my_format(f["flow_right"])}\033[39m | """
+        out += f"""\033[93m{my_format(p["in_le"])}\033[39m | \033[93m{my_format(p["out_le"])}\033[39m | \033[93m{my_format(p["in_ri"])}\033[39m | \033[93m{my_format(p["out_ri"])}\033[39m |"""
+        print(out)
 
     def to_terminal(self):
         counter = 0

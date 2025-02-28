@@ -1,43 +1,41 @@
 from serial import Serial, EIGHTBITS, STOPBITS_ONE, PARITY_NONE
 import os, re, time
 from datetime import datetime
+from .usbports import get_port
+from environs import Env
+ 
 
 class Mux:
     """
     output looks like this: [weights_1, weights_2, weights_3, weights_4, temp_1, temp_2, temp_3, temp_4]
     """
-    def __init__(self, uid, device, number_of_scales, max_values, sleep_time=60):
-        self.UID = uid
-        self.DEVICE = device
+    def __init__(self, max_values, sleep_time=60):
+
+        # Initialize the environment & read env file
+        env = Env()
+        env.read_env()
+
+        # Initialize MUX
+        self.UID = env("MUX")
         self.CR = "\x0D"
         self.create_port()
-        self.SCALES = number_of_scales
         self.COUNTER = 0
         self.MAX_VALUES = max_values
         self.SLEEP = sleep_time
-        #self.zero_all_scales()
 
     def create_port(self, ):
-        if os.name == "nt":
-            self.ser = Serial(port=f"""{self.DEVICE}""", 
-                              baudrate=9600, 
-                              bytesize=EIGHTBITS, 
-                              parity=PARITY_NONE, 
-                              stopbits=STOPBITS_ONE, 
-                              timeout=0.2, 
-                              xonxoff=False, 
-                              rtscts=False, 
-                              dsrdtr=False)
-        else:
-            self.ser = Serial(port=f"""/dev/{self.DEVICE}""", 
-                              baudrate=9600, 
-                              bytesize=EIGHTBITS, 
-                              parity=PARITY_NONE, 
-                              stopbits=STOPBITS_ONE, 
-                              timeout=0.2, 
-                              xonxoff=False, 
-                              rtscts=False, 
-                              dsrdtr=False)
+        port = get_port(devicetype="scale")
+        print("PORT returned", port)
+        exit()
+        self.ser = Serial(port=port, 
+                          baudrate=9600, 
+                          bytesize=EIGHTBITS, 
+                          parity=PARITY_NONE, 
+                          stopbits=STOPBITS_ONE, 
+                          timeout=0.2, 
+                          xonxoff=False, 
+                          rtscts=False, 
+                          dsrdtr=False)
         print("scales port was initiated ...")
 
     @staticmethod
@@ -116,36 +114,6 @@ class Mux:
         values = self.muxread()
         return values.replace("#06", "")
 
-    #def view_output(self, scale_values):
-    #    BOLD = "\033[1m"
-    #    RED = "\033[31m"
-    #    YELLOW = "\033[33m"
-    #    CYAN = "\033[36m"
-    #    BLUE = "\033[34m"
-    #    RESET = "\033[0m"
-    #    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    #    
-    #    m = f"""0{len(str(self.MAX_VALUES))}"""
-    #    out = f"""{self.COUNTER:{m}} / {self.MAX_VALUES:{m}} - scales: """
-    #    if self.SCALES == 8:
-    #        scale_string = "  |  ".join([f"""{BOLD}{RED}{key}:{RESET} {scale_values[key]}kg""" for key in scale_values.keys() if key not in ["mux", "timestamp"]])
-    #    elif self.SCALES == 4:
-    #        # Convert keys to a list for slicing
-    #        keys_list = list(scale_values.keys())
-    #        t = []
-    #        for idx, key in enumerate(keys_list):
-    #            if idx < 4:
-    #                t.append(f"""{BOLD}{RED}{key}:{RESET} {float(scale_values[key]):06.3f}kg""")
-    #            else:
-    #                t.append(f"""{BOLD}{CYAN}{key}:{RESET} {float(scale_values[key]):06.2f}°C""")
-    #        scale_string = "  |  ".join(t)
-    #    else:
-    #        print("just printing the output:", scale_values)
-    #
-    #
-    #    print(f"""\r{out}{scale_string}""", end="")
-    #    
-    #    if self.COUNTER == self.MAX_VALUES:
-    #        return
-    #
-    #
+
+if __name__ == "__main__":
+    mux = Mux()

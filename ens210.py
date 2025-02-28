@@ -1,16 +1,18 @@
 from serial import Serial, EIGHTBITS, STOPBITS_ONE, PARITY_NONE
 import os, time 
+from .usbports import get_port
 
 class Temp:
-    def __init__(self, device, sensors):
-        self.dev = f"""/dev/{device}""" ##f os.name == "nt": dev = f"""{self.DEVICE}"""
+    def __init__(self, sensors):
+        # self.dev = f"""/dev/{device}""" ##f os.name == "nt": dev = f"""{self.DEVICE}"""
         self.create_port()
         self.CR = "\x0D"
         self.sensors = sensors
         # sensors = {"top_left": "g", "bot_left": "d", "top_mid": "j", "bot_mid": "i", "top_right": "m", "bot_right": "k"}
 
     def create_port(self, ):
-        self.ser = Serial(port=self.dev, baudrate=9600, bytesize=EIGHTBITS, parity=PARITY_NONE, stopbits=STOPBITS_ONE, timeout=.2, xonxoff=False, rtscts=False, dsrdtr=False)
+        p = get_port(devicetype="temp")
+        self.ser = Serial(port=p, baudrate=9600, bytesize=EIGHTBITS, parity=PARITY_NONE, stopbits=STOPBITS_ONE, timeout=.2, xonxoff=False, rtscts=False, dsrdtr=False)
 
     def get_all_temps(self):
         values = {"temp_top_right": None, "temp_bot_right": None, "temp_top_mid": None, "temp_bot_mid": None, "temp_top_left": None, "temp_bot_left": None, 

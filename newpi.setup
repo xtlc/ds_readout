@@ -1,0 +1,38 @@
+take a new pi and generate an image for a pi5 with some settings:
+
+ - username: rabaton
+ - password: lack..
+ - wifi: rudi // bbaton125!
+ - enable ssh
+
+first time boot use an external monitor and obtain the IP address of the device
+enable under preferences -> raspberry configuration
+ - onewire
+ - I2C
+ - SPI
+
+then reboot. afterwards -> Accessoires -> SD Card Copier
+
+ - copy content of SD card onto SSD (new UUID Partitions must be checked)
+
+open sudo nano /boot/firmware/config.txt and add the line: dtparam=pciex1
+power off, remove SD card, power on
+
+## register the pi with our raspberry cloud:
+
+sudo apt update
+sudo apt upgrade
+
+click icon right top on the desktop with the two squares and the circles and use
+ - beschaffung@abaton.studio
+ - rasART135!
+
+## ssh key für ds_readout git raphael geben
+ - ssh-keygen -t rsa
+ - den public key ins gitHub kopieren als deploy key
+ - git clone https://github.com/xtlc/ds_readout.git machen am pi
+ - cd ds_readout
+ - python -m venv venv
+ - source venv/bin/activate
+ - python -m pip install -r req
+ - 

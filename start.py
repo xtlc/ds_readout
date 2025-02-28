@@ -26,10 +26,12 @@ bucket = env("BUCKET")
 #             3: {"uid": "0020240425142741", "comment": "mux_8kg_1", "number_of_scales": 4},}  
  
 DS18B20s = {"in_ri": "0000006a2c70", "out_ri": "0000006ada1a", "in_le": "d5d3f91d64ff", "out_le": "a7d0f91d64ff"}
-USB_TEMP = "ttyUSB1"
-USB_SCALE = "ttyUSB0"
+# USB_TEMP = "ttyUSB1"
+# USB_SCALE = "ttyUSB0"
 FLOW_GPIOs = [12, 13]
-MUX = "0020240425142741"
+# MUX = "0020240425142741" #teststand 1
+# MUX = "0020241017114723" #teststand 2
+MUX = env("MUX")
 # ENS210s = {"top_left": 103, "bot_left": 100, "top_mid": 106, "bot_mid": 105, "top_right": 109, "top_left": 107}
 ENS210s = {"top_left": "g", "bot_left": "d", "top_mid": "j", "bot_mid": "i", "top_right": "m", "bot_right": "k"}
 
@@ -45,15 +47,11 @@ def zero_all_scales():
 
 def to_terminal():
     from measure import Measurement
-    m = Measurement(device_temp_usb=USB_TEMP, 
-                    device_scale_usb=USB_SCALE,  
-                    name_left=scale_left,
+    m = Measurement(name_left=scale_left,
                     name_right=scale_right,
                     pt100s=DS18B20s,
                     ens210s=ENS210s,
-                    scale_uid=MUX, 
                     device_flow_GPIOs=FLOW_GPIOs, 
-                    number_of_scales=2, 
                     measurements=0, 
                     sleep_time=3, 
                     host=host, 
@@ -68,15 +66,11 @@ def to_terminal():
 
 def to_influx():
     from measure import Measurement
-    m = Measurement(device_temp_usb=USB_TEMP, 
-                    device_scale_usb=USB_SCALE, 
-                    name_left=scale_left,
+    m = Measurement(name_left=scale_left,
                     name_right=scale_right,
                     pt100s=DS18B20s,
                     ens210s=ENS210s,
-                    scale_uid=MUX, 
                     device_flow_GPIOs=FLOW_GPIOs, 
-                    number_of_scales=2, 
                     measurements=0, 
                     sleep_time=60, 
                     host=host, 

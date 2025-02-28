@@ -1,0 +1,21 @@
+take a new pi and generate an image for a pi5 with some settings:
+
+ - username: rabaton
+ - password: lack..
+ - wifi: rudi // bbaton125!
+ - enable ssh
+
+first time boot use an external monitor and obtain the IP address of the device
+enable under preferences -> raspberry configuration
+ - onewire
+ - I2C
+ - SPI
+
+then reboot. afterwards -> Accessoires -> SD Card Copier
+
+ - copy content of SD card onto SSD (new UUID Partitions must be checked)
+
+open sudo nano /boot/firmware/config.txt and add the line: dtparam=pciex1
+power off, remove SD card, power on
+
+
