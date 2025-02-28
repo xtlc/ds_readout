@@ -14,12 +14,6 @@ foldername = "rclone"
 env = Env()
 env.read_env()
 
-# InfluxDB parameters
-token = env("INFLUX_TOKEN")
-org = "abaton_influx"
-host = "https://eu-central-1-1.aws.cloud2.influxdata.com"
-host = "127.0.0.1:8186"
-bucket = env("BUCKET")
 
 # mux_dict = {1: {"uid": "0120211005135155", "comment": "mux_4kg_1", "number_of_scales": 8}, 
 #             2: {"uid": "0120211005135902", "comment": "mux_4kg_2", "number_of_scales": 8},
@@ -54,10 +48,6 @@ def to_terminal():
                     device_flow_GPIOs=FLOW_GPIOs, 
                     measurements=0, 
                     sleep_time=3, 
-                    host=host, 
-                    token=token, 
-                    bucket=bucket, 
-                    org=org, 
                     foldername=foldername,
                     ircam=False,
                     cam=False)
@@ -73,10 +63,6 @@ def to_influx():
                     device_flow_GPIOs=FLOW_GPIOs, 
                     measurements=0, 
                     sleep_time=60, 
-                    host=host, 
-                    token=token, 
-                    bucket=bucket, 
-                    org=org,
                     foldername=foldername,
                     ircam=True, 
                     cam=True)

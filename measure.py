@@ -7,6 +7,8 @@ from ens210 import Temp
 from pt100 import PT100
 from flow import Flow
 import colorama
+from environs import Env
+
 
 class Measurement:
     def __init__(self, 
@@ -16,13 +18,20 @@ class Measurement:
                  ens210s=None,
                  measurements=0, 
                  sleep_time=60, 
-                 host=None,
-                 token=None,
-                 bucket=None, 
                  cam=False,
                  ircam=False,
-                 org=None,
                  foldername="rclone"):
+
+        # Initialize the environment & read env file
+        env = Env()
+        env.read_env()
+
+        # InfluxDB parameters
+        self.token = env("INFLUX_TOKEN")
+        self.org = "abaton_influx"
+        self.host = "https://eu-central-1-1.aws.cloud2.influxdata.com"
+        self.host = "127.0.0.1:8186"
+        self.bucket = env("BUCKET")
 
         if name_left:
             self.scale_left = name_left

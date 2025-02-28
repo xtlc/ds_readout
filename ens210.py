@@ -1,6 +1,6 @@
 from serial import Serial, EIGHTBITS, STOPBITS_ONE, PARITY_NONE
 import os, time 
-from .usbports import get_port
+from usbports import get_port
 
 class Temp:
     def __init__(self, sensors):

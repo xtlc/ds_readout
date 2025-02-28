@@ -1,7 +1,7 @@
 from serial import Serial, EIGHTBITS, STOPBITS_ONE, PARITY_NONE
 import os, re, time
 from datetime import datetime
-from .usbports import get_port
+from usbports import get_port
 from environs import Env
  
 
