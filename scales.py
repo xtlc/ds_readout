@@ -9,7 +9,7 @@ class Mux:
     """
     output looks like this: [weights_1, weights_2, weights_3, weights_4, temp_1, temp_2, temp_3, temp_4]
     """
-    def __init__(self, max_values, sleep_time=60):
+    def __init__(self, max_values=0, sleep_time=60):
 
         # Initialize the environment & read env file
         env = Env()
