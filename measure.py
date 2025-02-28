@@ -69,10 +69,7 @@ class Measurement:
         if ircam:
             from ir import IRCam
             self.ircam = IRCam(foldername=foldername, name_left=name_left, name_right=name_right)
-        
-        if host:
-            self.client = InfluxDBClient(url=host, token=token, org=org)
-            self.bucket = bucket
+
         self.wait_time = sleep_time ## seconds
         
         ## for rclone
