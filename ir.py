@@ -5,32 +5,30 @@
 ##################################
 import time, board, busio
 import numpy as np
-import adafruit_mlx90640
+import adafruit_mlx90640, adafruit_tca9548a
 from datetime import datetime
 import cv2
 import cmapy
 from scipy import ndimage
 from pathlib import Path
 
+
 class IRCam:
-    def __init__(self, image_width:int=1200, image_height:int=900, foldername="rclone", name_left=None, name_right=None):#, output_folder:str = '/home/pi/pithermalcam/saved_snapshots/'):
+    def __init__(self, image_width:int=1200, image_height:int=900, foldername="rclone", name_left=None, name_right=None):
         self.image_width=image_width
         self.image_height=image_height
         self.output_folder=Path.cwd().joinpath(foldername)
-        self._setup_therm_cam()
+        self._setup_tca9548a()
         self._t0 = time.time()
         self.Tmin = 5
         self.Tmax = 30
         self.name_left = name_left
         self.name_right = name_right
-
-    def _setup_therm_cam(self):
-        """Initialize the thermal camera"""
-        # Setup camera
-        self.i2c = busio.I2C(board.SCL, board.SDA, frequency=400000)  # setup I2C
-        self.mlx = adafruit_mlx90640.MLX90640(self.i2c)  # begin MLX90640 with I2C comm
-        self.mlx.refresh_rate = adafruit_mlx90640.RefreshRate.REFRESH_4_HZ  # set refresh rate
-        time.sleep(0.1)
+        
+    def _setup_tca9548a(self):
+        _i2c = board.I2C()
+        self.tca = adafruit_tca9548a.TCA9548A(_i2c) # -> erkennt: Channel 0:['0x33'], Channel 1:['0x33'] ...
+        # print("TCA9548A setup complete")
 
     def _temps_to_rescaled_uints(self, f):
         """Function to convert temperatures to pixels on image"""
@@ -53,23 +51,31 @@ class IRCam:
             print("IO Error; continuing...")
             self._raw_image = np.zeros((24*32,))  # If something went wrong, make sure the raw image has numbers
     
-    def save_image(self):
+    def save_image(self, channel: int):
         """Save the current frame as a snapshot to the output folder."""
+
+        ## the camera used
+        self.mlx = adafruit_mlx90640.MLX90640(self.tca[channel])
+        self.mlx.refresh_rate = adafruit_mlx90640.RefreshRate.REFRESH_4_HZ  # set refresh rate
+        time.sleep(0.1)
+
         self._pull_raw_image()
         self._process_raw_image()
         
         # Create the color scale
         color_scale = self._create_color_scale()
-        
+            
         # Combine the thermal image and the color scale
         combined_image = self._combine_images(self._image, color_scale)
 
         # add captures
         img_with_catpures = self._add_captures(img=combined_image)
-        
-        fname = self.output_folder.joinpath(f"""IR_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.jpg""")
+            
+        fname = self.output_folder.joinpath(f"""IR_channel_{channel}_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.jpg""")
         cv2.imwrite(fname, img_with_catpures)
-        print("Thermal Image ", fname, "saved")
+        # print("Thermal Image ", fname, "saved")
+        self.tca[channel].unlock()
+
 
     def _create_color_scale(self):
         """Create a horizontal color scale image with labels."""
@@ -141,5 +147,9 @@ class IRCam:
         self._image = cv2.applyColorMap(self._image, cv2.COLORMAP_JET)
         self._image = cv2.flip(self._image, 1)
 
-irc = IRCam()
-irc.save_image()
+if __name__ == "__main__":
+    irc = IRCam()
+    irc.save_image(channel=0)
+    print("chan0 done, now chan1")
+    irc.save_image(channel=1)
+    print("channel 1 done, all done")
