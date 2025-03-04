@@ -14,24 +14,15 @@ foldername = "rclone"
 env = Env()
 env.read_env()
 
-
-# mux_dict = {1: {"uid": "0120211005135155", "comment": "mux_4kg_1", "number_of_scales": 8}, 
-#             2: {"uid": "0120211005135902", "comment": "mux_4kg_2", "number_of_scales": 8},
-#             3: {"uid": "0020240425142741", "comment": "mux_8kg_1", "number_of_scales": 4},}  
- 
 DS18B20s = {"in_ri": "0000006a2c70", "out_ri": "0000006ada1a", "in_le": "d5d3f91d64ff", "out_le": "a7d0f91d64ff"}
-# USB_TEMP = "ttyUSB1"
-# USB_SCALE = "ttyUSB0"
-FLOW_GPIOs = [12, 13]
-# MUX = "0020240425142741" #teststand 1
-# MUX = "0020241017114723" #teststand 2
 MUX = env("MUX")
+
 # ENS210s = {"top_left": 103, "bot_left": 100, "top_mid": 106, "bot_mid": 105, "top_right": 109, "top_left": 107}
-ENS210s = {"top_left": "g", "bot_left": "d", "top_mid": "j", "bot_mid": "i", "top_right": "m", "bot_right": "k"}
+ENS210s = {"top_left": "n", "bot_left": "o", "top_mid": "p", "bot_mid": "q", "top_right": "m", "bot_right": "k"}
 
 ## helper for the ENS210:
-#   100 -> d    101 -> e    102 -> f    103 -> g    104 -> h    105 -> i    106 -> j    107 -> k    108 -> l    109 -> m    110 -> n
-#   111 -> o    112 -> p    113 -> q    114 -> r    115 -> s
+#   100 -> d    101 -> e    102 -> f    103 -> g    104 -> h    105 -> i    106 -> j    107 -> k    108 -> l    
+#   109 -> m    110 -> n    111 -> o    112 -> p    113 -> q    114 -> r    115 -> s
 
 def zero_all_scales():
     print("Executing zero_all_scales()...")
@@ -45,7 +36,6 @@ def to_terminal():
                     name_right=scale_right,
                     pt100s=DS18B20s,
                     ens210s=ENS210s,
-                    device_flow_GPIOs=FLOW_GPIOs, 
                     measurements=0, 
                     sleep_time=3, 
                     foldername=foldername,
@@ -60,7 +50,6 @@ def to_influx():
                     name_right=scale_right,
                     pt100s=DS18B20s,
                     ens210s=ENS210s,
-                    device_flow_GPIOs=FLOW_GPIOs, 
                     measurements=0, 
                     sleep_time=60, 
                     foldername=foldername,
