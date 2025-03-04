@@ -34,7 +34,7 @@ if __name__ == "__main__":
     sensors = []
     for item in BASEDIR.iterdir():
         if item.is_dir() and item.name.startswith("28-"):
-            sensors.append(item.name)
+            sensors.append(item.name[3:])
             print(f"""found sensor: {item.name}""")
     print("------------------------------ T E S T I N G ----------------------------------------------")
     print("using", sensors)
