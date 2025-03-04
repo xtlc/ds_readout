@@ -33,10 +33,9 @@ if __name__ == "__main__":
     print("Test mode running ...")    # You can call your function here if needed
     sensors = []
     for item in BASEDIR.iterdir():
-        if item.is_dir():
+        if item.is_dir() and item.name.startswith("28-"):
+            sensors.append(item.name)
             print(f"""found sensor: {item.name}""")
-            if item.name.startswith("00000-"):
-                sensors.append(item.name)
     print("------------------------------ T E S T I N G ----------------------------------------------")
     # f = PT100(PT100_WATER_IN_RIGHT="0000006a2c70", PT100_WATER_OUT_RIGHT="0000006ada1a", PT100_WATER_IN_LEFT="d5d3f91d64ff", PT100_WATER_OUT_LEFT="a7d0f91d64ff") ## for
     try:
