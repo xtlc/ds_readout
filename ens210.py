@@ -41,7 +41,7 @@ class Temp:
 
 
 if __name__ == "__main__":
-    ENS210s = {"top_left": "g", "bot_left": "d", "top_mid": "j", "bot_mid": "i", "top_right": "m", "bot_right": "k"}
+    ENS210s = {"top_left": "n", "bot_left": "o", "top_mid": "p", "bot_mid": "q", "top_right": "r", "bot_right": "s"}
     t = Temp(sensors=ENS210s)
     while True:
         print(t.get_all_temps())
