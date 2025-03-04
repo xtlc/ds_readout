@@ -1,4 +1,5 @@
 from pathlib import Path
+import time
 
 BASEDIR = Path("/sys/bus/w1/devices/")
 
@@ -38,3 +39,4 @@ if __name__ == "__main__":
     while True:
         t = f.get_temps()
         print(t)
+        time.sleep(1)

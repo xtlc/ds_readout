@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/python3
-##################################
-# MLX90640 Thermal Camera w Raspberry Pi
-##################################
 import time, board, busio
 import numpy as np
 import adafruit_mlx90640, adafruit_tca9548a
@@ -75,7 +71,6 @@ class IRCam:
         cv2.imwrite(fname, img_with_catpures)
         # print("Thermal Image ", fname, "saved")
         self.tca[channel].unlock()
-
 
     def _create_color_scale(self):
         """Create a horizontal color scale image with labels."""
