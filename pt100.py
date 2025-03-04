@@ -40,19 +40,25 @@ if __name__ == "__main__":
     print("using", sensors)
     # f = PT100(PT100_WATER_IN_RIGHT="0000006a2c70", PT100_WATER_OUT_RIGHT="0000006ada1a", PT100_WATER_IN_LEFT="d5d3f91d64ff", PT100_WATER_OUT_LEFT="a7d0f91d64ff") ## for
     try:
-        f = PT100(PT100_WATER_IN_RIGHT=s[0], PT100_WATER_OUT_RIGHT=s[1], PT100_WATER_IN_LEFT=s[2], PT100_WATER_OUT_LEFT=s[3])
+        f = PT100(PT100_WATER_IN_RIGHT=sensors[0], 
+                  PT100_WATER_OUT_RIGHT=sensors[1], 
+                  PT100_WATER_IN_LEFT=sensors[2], 
+                  PT100_WATER_OUT_LEFT=sensors[3])
         print("4 x PT100 found!")
     except:
         try:
-            f = PT100(PT100_WATER_IN_RIGHT=s[0], PT100_WATER_OUT_RIGHT=s[1], PT100_WATER_IN_LEFT=s[2])
+            f = PT100(PT100_WATER_IN_RIGHT=sensors[0],
+                      PT100_WATER_OUT_RIGHT=sensors[1], 
+                      PT100_WATER_IN_LEFT=sensors[2])
             print("3 x PT100 found")
         except:
             try:
-                f = PT100(PT100_WATER_IN_RIGHT=s[0], PT100_WATER_OUT_RIGHT=s[1])
+                f = PT100(PT100_WATER_IN_RIGHT=sensors[0], 
+                          PT100_WATER_OUT_RIGHT=sensors[1])
                 print("2 x PT100 found")
             except:
                 try:
-                    f = PT100(PT100_WATER_IN_RIGHT=s[0])
+                    f = PT100(PT100_WATER_IN_RIGHT=sensors[0])
                     print("1 x PT100 found")
                 except:
                     print("no PT100 found :(")
