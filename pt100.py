@@ -37,6 +37,7 @@ if __name__ == "__main__":
             sensors.append(item.name)
             print(f"""found sensor: {item.name}""")
     print("------------------------------ T E S T I N G ----------------------------------------------")
+    print("using", sensors)
     # f = PT100(PT100_WATER_IN_RIGHT="0000006a2c70", PT100_WATER_OUT_RIGHT="0000006ada1a", PT100_WATER_IN_LEFT="d5d3f91d64ff", PT100_WATER_OUT_LEFT="a7d0f91d64ff") ## for
     try:
         f = PT100(PT100_WATER_IN_RIGHT=s[0], PT100_WATER_OUT_RIGHT=s[1], PT100_WATER_IN_LEFT=s[2], PT100_WATER_OUT_LEFT=s[3])
