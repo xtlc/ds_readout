@@ -31,11 +31,33 @@ class PT100:
 
 if __name__ == "__main__":
     print("Test mode running ...")    # You can call your function here if needed
+    sensors = []
     for item in BASEDIR.iterdir():
         if item.is_dir():
             print(f"""found sensor: {item.name}""")
-    print("----------------------------------------------------------------------------")
-    f = PT100(PT100_WATER_IN_RIGHT="0000006a2c70", PT100_WATER_OUT_RIGHT="0000006ada1a", PT100_WATER_IN_LEFT="d5d3f91d64ff", PT100_WATER_OUT_LEFT="a7d0f91d64ff") ## for
+            if item.name.startswith("00-"):
+                sensors.append(item.name)
+    print("------------------------------ T E S T I N G ----------------------------------------------")
+    # f = PT100(PT100_WATER_IN_RIGHT="0000006a2c70", PT100_WATER_OUT_RIGHT="0000006ada1a", PT100_WATER_IN_LEFT="d5d3f91d64ff", PT100_WATER_OUT_LEFT="a7d0f91d64ff") ## for
+    try:
+        f = PT100(PT100_WATER_IN_RIGHT=s[0], PT100_WATER_OUT_RIGHT=s[1], PT100_WATER_IN_LEFT=s[2], PT100_WATER_OUT_LEFT=s[3])
+        print("4 x PT100 found!")
+    except:
+        try:
+            f = PT100(PT100_WATER_IN_RIGHT=s[0], PT100_WATER_OUT_RIGHT=s[1], PT100_WATER_IN_LEFT=s[2])
+            print("3 x PT100 found")
+        except:
+            try:
+                f = PT100(PT100_WATER_IN_RIGHT=s[0], PT100_WATER_OUT_RIGHT=s[1])
+                print("2 x PT100 found")
+            except:
+                try:
+                    f = PT100(PT100_WATER_IN_RIGHT=s[0])
+                    print("1 x PT100 found")
+                except:
+                    print("no PT100 found :(")
+
+
     while True:
         t = f.get_temps()
         print(t)
