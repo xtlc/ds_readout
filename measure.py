@@ -16,7 +16,6 @@ class Measurement:
                  name_right=None,
                  pt100s=None,
                  ens210s=None,
-                 device_flow_GPIOs=None,
                  measurements=0, 
                  sleep_time=60, 
                  cam=False,
@@ -56,7 +55,7 @@ class Measurement:
             exit()
         
         if device_flow_GPIOs:
-            self.flows = Flow(FLOW_SENSOR_GPIO_RIGHT=device_flow_GPIOs[0], FLOW_SENSOR_GPIO_LEFT=device_flow_GPIOs[1],)
+            self.flows = Flow()
         
         if pt100s != None:
             self.pt100s = PT100(PT100_WATER_IN_RIGHT=pt100s["in_ri"], PT100_WATER_OUT_RIGHT=pt100s["out_ri"], PT100_WATER_IN_LEFT=pt100s["in_le"], PT100_WATER_OUT_LEFT=pt100s["out_le"])
