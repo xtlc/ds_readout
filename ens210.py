@@ -27,7 +27,6 @@ class Temp:
 
     def serread(self):
         r = self.ser.read_until(self.CR)
-        print(r, "<----")
         return r.decode("utf-8").strip("\r\n\x00") 
     
     def sanitize(self, readout):
