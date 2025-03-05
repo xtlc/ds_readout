@@ -35,8 +35,8 @@ class Temp:
         """
         print("To split:", readout)
         try:
-            s[-3:], t, h = readout.split(" ")
-            return s, float(t), float(h)
+            s, t, h = readout.split(" ")
+            return s[-3:], float(t), float(h)
         except:
             return None, float("nan"), float("nan")
 
