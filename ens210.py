@@ -33,7 +33,6 @@ class Temp:
         """
         returns: sensor, temp, humid
         """
-        print("To split:", readout)
         try:
             s, t, h = readout.split(" ")
             return s[-3:], float(t), float(h)
