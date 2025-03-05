@@ -27,14 +27,14 @@ class Temp:
 
     def serread(self):
         r = self.ser.read_until(self.CR)
-        return r.decode("utf-8").strip("\r\n") 
+        return r.decode("utf-8").strip("\r\n\x00") 
     
     def sanitize(self, readout):
         """
         returns: sensor, temp, humid
         """
         try:
-            s, t, h = readout.split(" ")
+            s[-3:], t, h = readout.split(" ")
             return s, float(t), float(h)
         except:
             return None, float("nan"), float("nan")
