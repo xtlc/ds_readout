@@ -54,8 +54,7 @@ class Measurement:
             print(f"ens210 could not be initialized, aborting")
             exit()
         
-        if device_flow_GPIOs:
-            self.flows = Flow()
+        self.flows = Flow()
         
         if pt100s != None:
             self.pt100s = PT100(PT100_WATER_IN_RIGHT=pt100s["in_ri"], PT100_WATER_OUT_RIGHT=pt100s["out_ri"], PT100_WATER_IN_LEFT=pt100s["in_le"], PT100_WATER_OUT_LEFT=pt100s["out_le"])
