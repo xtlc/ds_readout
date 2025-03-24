@@ -14,7 +14,7 @@ class Cam:
         self.qual = 100 if filetype == "jpeg" else 10
 
     def _shoot(self, filename):
-        cmd = ["fswebcam", "-r", f"""{self.res_x}x{self.res_y}""", f"""--{self.filetype}""", f"""{self.qual}""", "--no-banner", f"{filename}.{self.filetype}"]
+        cmd = ["rpicam-still", "-n", "--width", f"""{self.res_x}""", "--height", f"""{self.res_y}""", "--output", f"{filename}.{self.filetype}"]
         subprocess.run(cmd, check=True)
         
         # Open the captured image
