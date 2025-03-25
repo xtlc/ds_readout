@@ -117,4 +117,5 @@ if __name__ == "__main__":
     mux = Mux()
     r = mux.get_revision()
     print("test successful, revision of the mux:", r)
-    r.get_all_weights()
+    s = mux.get_all_weights()
+    print("tested for weights:", s)
