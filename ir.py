@@ -114,9 +114,13 @@ class IRCam:
         cv2.putText(img, now, (now_x, 30), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
         # adding names
-        if self.name_left and self.name_right:
-            cv2.putText(img, self.name_left, (10, 30), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-            cv2.putText(img, self.name_right, (width - 10 - cv2.getTextSize(self.name_right, cv2.FONT_HERSHEY_DUPLEX, 1, 2)[0][0], 30), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+        if not self.name_left:
+            self.name_let = "left" 
+        if not self.name_right:
+            self.name_right = "right"
+
+        cv2.putText(img, self.name_left, (10, 30), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.putText(img, self.name_right, (width - 10 - cv2.getTextSize(self.name_right, cv2.FONT_HERSHEY_DUPLEX, 1, 2)[0][0], 30), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
         return img
 
