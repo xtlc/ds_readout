@@ -89,10 +89,8 @@ class Mux:
             if self.COUNTER == self.MAX_VALUES:
                 print("counter ran out ...")
                 exit()
-        print("asking scales for weights ...")
         self.muxwrite(cmd="gl", pre="#")
         r = self.muxread()
-        print("got back", r)
         values = self.sanitize(mux_readout=r)
         return {f"{i:02}": values[i] for i in range(len(values))}
 
@@ -112,7 +110,6 @@ class Mux:
     def get_revision(self):
         self.muxwrite(cmd="gr", pre="#")
         values = self.muxread()
-        print("---- values ---->", values)
         return values.replace("#06", "")
 
 
