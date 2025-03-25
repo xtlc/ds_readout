@@ -92,6 +92,7 @@ class Mux:
         print("asking scales for weights ...")
         self.muxwrite(cmd="gl", pre="#")
         r = self.muxread()
+        print("got back", r)
         values = self.sanitize(mux_readout=r)
         return {f"{i:02}": values[i] for i in range(len(values))}
 
