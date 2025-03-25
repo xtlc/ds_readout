@@ -110,6 +110,7 @@ class Mux:
     def get_revision(self):
         self.muxwrite(cmd="gr", pre="#")
         values = self.muxread()
+        print("---- values ---->", values)
         return values.replace("#06", "")
 
 
