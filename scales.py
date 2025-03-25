@@ -89,6 +89,7 @@ class Mux:
             if self.COUNTER == self.MAX_VALUES:
                 print("counter ran out ...")
                 exit()
+        print("asking scales for weights ...")
         self.muxwrite(cmd="gl", pre="#")
         r = self.muxread()
         values = self.sanitize(mux_readout=r)
