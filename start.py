@@ -14,7 +14,11 @@ foldername = "rclone"
 env = Env()
 env.read_env()
 
-DS18B20s = {"in_ri": "0000006a2c70", "out_ri": "0000006ada1a", "in_le": "d5d3f91d64ff", "out_le": "a7d0f91d64ff"}
+# teststand #2
+DS18B20s = {"in_ri": "187a7c1f64ff", "out_ri": "ca8a7d1f64ff", "in_le": "f6f8510a6461", "out_le": "1df9510a6461"}
+
+#teststand #1
+# DS18B20s = {"in_ri": "0000006a2c70", "out_ri": "0000006ada1a", "in_le": "d5d3f91d64ff", "out_le": "a7d0f91d64ff"}
 MUX = env("MUX")
 
 # ENS210s = {"top_left": 103, "bot_left": 100, "top_mid": 106, "bot_mid": 105, "top_right": 109, "top_left": 107}
@@ -29,6 +33,7 @@ def zero_all_scales():
     from scales import Mux
     s = Mux()
     s.zero_all_scales()
+    s.get_all_weights()
 
 def to_terminal():
     from measure import Measurement
