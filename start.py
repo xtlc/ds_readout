@@ -20,6 +20,9 @@ env.read_env()
 #teststand #1
 # DS18B20s = {"in_ri": "0000006a2c70", "out_ri": "0000006ada1a", "in_le": "d5d3f91d64ff", "out_le": "a7d0f91d64ff"}
 
+## scales
+MUX = env("MUX")
+
 ## DS18B20s
 DS18B20s = {"in_ri":    env("DS18B20_IN_RIGHT"), 
             "out_ri":   env("DS18B20_OUT_RIGHT"), 
@@ -34,16 +37,6 @@ ENS210s = {"top_left":  env("ENS210_TOP_LEFT"),
            "top_right": env("ENS210_TOP_RIGHT"), 
            "bot_right": env("ENS210_BOT_RIGHT"), }
 
-ENS210s = {"top_left": "n", "bot_left": "o", "top_mid": "p", "bot_mid": "q", "top_right": "m", "bot_right": "k"}
-
-
-## scales
-MUX = env("MUX")
-
-
-
-# ENS210s = {"top_left": 103, "bot_left": 100, "top_mid": 106, "bot_mid": 105, "top_right": 109, "top_left": 107}
-ENS210s = {"top_left": "n", "bot_left": "o", "top_mid": "p", "bot_mid": "q", "top_right": "m", "bot_right": "k"}
 
 ## helper for the ENS210:
 #   100 -> d    101 -> e    102 -> f    103 -> g    104 -> h    105 -> i    106 -> j    107 -> k    108 -> l    
