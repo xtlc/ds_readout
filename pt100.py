@@ -30,6 +30,10 @@ class PT100:
 
 
 if __name__ == "__main__":
+    from environs import Env
+
+    env = Env()
+    env.read_env()
     print("Test mode running ...")    # You can call your function here if needed
     sensors = []
     for item in BASEDIR.iterdir():
