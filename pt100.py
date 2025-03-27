@@ -42,8 +42,6 @@ if __name__ == "__main__":
             print(f"""found sensor: {item.name}""")
     print("------------------------------ T E S T I N G ----------------------------------------------")
     print("using", sensors)
-    # f = PT100(PT100_WATER_IN_RIGHT="0000006a2c70", PT100_WATER_OUT_RIGHT="0000006ada1a", PT100_WATER_IN_LEFT="d5d3f91d64ff", PT100_WATER_OUT_LEFT="a7d0f91d64ff") ## for
-    # DS18B20s = {"in_ri": , "out_ri": env("DS18B20_OUT_RIGHT"), "in_le":env("DS18B20_IN_LEFT"), "out_le": env("DS18B20_OUT_LEFT")}
     pt100s = PT100(PT100_WATER_IN_LEFT=env("DS18B20_IN_LEFT"), PT100_WATER_OUT_LEFT=env("DS18B20_OUT_LEFT"),
                    PT100_WATER_IN_RIGHT=env("DS18B20_IN_RIGHT"), PT100_WATER_OUT_RIGHT=env("DS18B20_OUT_RIGHT"))
 
