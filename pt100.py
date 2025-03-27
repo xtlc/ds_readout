@@ -39,32 +39,12 @@ if __name__ == "__main__":
     print("------------------------------ T E S T I N G ----------------------------------------------")
     print("using", sensors)
     # f = PT100(PT100_WATER_IN_RIGHT="0000006a2c70", PT100_WATER_OUT_RIGHT="0000006ada1a", PT100_WATER_IN_LEFT="d5d3f91d64ff", PT100_WATER_OUT_LEFT="a7d0f91d64ff") ## for
-    try:
-        f = PT100(PT100_WATER_IN_RIGHT=sensors[0], 
-                  PT100_WATER_OUT_RIGHT=sensors[1], 
-                  PT100_WATER_IN_LEFT=sensors[2], 
-                  PT100_WATER_OUT_LEFT=sensors[3])
-        print("4 x PT100 found!")
-    except:
-        try:
-            f = PT100(PT100_WATER_IN_RIGHT=sensors[0],
-                      PT100_WATER_OUT_RIGHT=sensors[1], 
-                      PT100_WATER_IN_LEFT=sensors[2])
-            print("3 x PT100 found")
-        except:
-            try:
-                f = PT100(PT100_WATER_IN_RIGHT=sensors[0], 
-                          PT100_WATER_OUT_RIGHT=sensors[1])
-                print("2 x PT100 found")
-            except:
-                try:
-                    f = PT100(PT100_WATER_IN_RIGHT=sensors[0])
-                    print("1 x PT100 found")
-                except:
-                    print("no PT100 found :(")
-                    exit()
+    # DS18B20s = {"in_ri": , "out_ri": env("DS18B20_OUT_RIGHT"), "in_le":env("DS18B20_IN_LEFT"), "out_le": env("DS18B20_OUT_LEFT")}
+    pt100s = PT100(PT100_WATER_IN_LEFT=env("DS18B20_IN_LEFT"), PT100_WATER_OUT_LEFT=env("DS18B20_OUT_LEFT"),
+                   PT100_WATER_IN_RIGHT=env("DS18B20_IN_RIGHT"), PT100_WATER_OUT_RIGHT=env("DS18B20_OUT_RIGHT"))
+
 
     while True:
-        t = f.get_temps()
+        t = pt100s.get_temps()
         print(t)
         time.sleep(1)
