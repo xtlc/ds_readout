@@ -1,11 +1,10 @@
 from pathlib import Path
 import time
 
-BASEDIR = Path("/sys/bus/w1/devices/")
-
 class PT100:
     def __init__(self, PT100_WATER_IN_RIGHT=None, PT100_WATER_OUT_RIGHT=None, PT100_WATER_IN_LEFT=None, PT100_WATER_OUT_LEFT=None):
         self.sensors = {}
+        BASEDIR = Path("/sys/bus/w1/devices/")
         if PT100_WATER_IN_RIGHT:
             self.sensors["in_ri"] =  BASEDIR.joinpath(f"""28-{PT100_WATER_IN_RIGHT}""", "w1_slave")
         if PT100_WATER_OUT_RIGHT:
@@ -26,8 +25,6 @@ class PT100:
                 values[name] = float("nan")
         return values
                 
-                
-
 
 if __name__ == "__main__":
     from environs import Env
