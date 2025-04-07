@@ -77,7 +77,6 @@ class Measurement:
         print(f"""Values from the scales: {w}""")
         
         t = self.temps.get_all_temps()
-        print(t)
         print(f"""Values from the ens210: {t}""")
         if len(t) != 12: 
             print(f"only {len(t)} ens210 sensors were found - aborting!")
@@ -122,6 +121,8 @@ class Measurement:
                 p_02 = Point(db_name).field(f"{self.scale_right}_right", float('nan')).time(now)
             
             ## temperature values
+            import pdb
+            pdb.set_trace()
             p_03 = Point(db_name).field(f"temp_scale_left_bot", t["temp_bot_left"]).time(now)
             p_04 = Point(db_name).field(f"humid_scale_left_bot", t["humid_bot_left"]).time(now)
             p_05 = Point(db_name).field(f"temp_scale_left_top", t["temp_top_left"]).time(now)
