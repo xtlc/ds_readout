@@ -30,6 +30,7 @@ class Measurement:
         self.host = "https://eu-central-1-1.aws.cloud2.influxdata.com"
         self.host = "127.0.0.1:8186"
         self.bucket = env("BUCKET")
+        self.client = InfluxDBClient(url=self.host, token=self.token, org=self.org)
 
         if name_left:
             self.scale_left = name_left
