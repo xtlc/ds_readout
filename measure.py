@@ -48,7 +48,7 @@ class Measurement:
         
         self.flows = Flow()
         self.pt100s = PT100()
-        self.temps = ens210s
+        self.temps = Temp()
 
         if cam:
             from cam import Cam
