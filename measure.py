@@ -77,9 +77,10 @@ class Measurement:
         print(f"""Values from the scales: {w}""")
         
         t = self.temps.get_all_temps()
+        print(t)
         print(f"""Values from the ens210: {t}""")
         if len(t) != 12: 
-            print(f"only {len(t)} temp/humidty/ens210 sensors were found - aborting!")
+            print(f"only {len(t)} ens210 sensors were found - aborting!")
             exit()
         
         f = self.flows.get_flow()
