@@ -50,11 +50,11 @@ class Measurement:
         self.pt100s = PT100()
         self.temps = Temp()
 
-        if cam:
+        if env("CAM") == 1
             from cam import Cam
             self.cam = Cam(resolution=[1920, 1080], filetype="jpeg", foldername=foldername)
 
-        if ircam:
+        if env("IRCAM") == 1
             from ir import IRCam
             self.ircam = IRCam(foldername=foldername, name_left=name_left, name_right=name_right)
 

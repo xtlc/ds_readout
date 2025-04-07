@@ -48,9 +48,7 @@ def to_terminal():
                     name_right=scale_right,
                     measurements=0, 
                     sleep_time=3, 
-                    foldername=foldername,
-                    ircam=False,
-                    cam=False)
+                    foldername=foldername)
     m.to_terminal()
     print("Executing to_terminal()...")
 
@@ -60,9 +58,7 @@ def to_influx():
                     name_right=scale_right,
                     measurements=0, 
                     sleep_time=60, 
-                    foldername=foldername,
-                    ircam=True, 
-                    cam=True)
+                    foldername=foldername)
     m.to_influx(db_name="teststand_1")
     print("Executing to_influx()...")
 
