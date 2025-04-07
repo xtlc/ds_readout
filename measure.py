@@ -14,8 +14,6 @@ class Measurement:
     def __init__(self, 
                  name_left=None,
                  name_right=None,
-                 pt100s=None,
-                 ens210s=None,
                  measurements=0, 
                  sleep_time=60, 
                  cam=False,
@@ -55,12 +53,8 @@ class Measurement:
             exit()
         
         self.flows = Flow()
-        
-        if pt100s != None:
-            self.pt100s = PT100(PT100_WATER_IN_RIGHT=pt100s["in_ri"], PT100_WATER_OUT_RIGHT=pt100s["out_ri"], PT100_WATER_IN_LEFT=pt100s["in_le"], PT100_WATER_OUT_LEFT=pt100s["out_le"])
-        
-        if ens210s != None:
-            self.ens210s = ens210s
+        self.pt100s = PT100(PT100_WATER_IN_RIGHT=pt100s["in_ri"], PT100_WATER_OUT_RIGHT=pt100s["out_ri"], PT100_WATER_IN_LEFT=pt100s["in_le"], PT100_WATER_OUT_LEFT=pt100s["out_le"])
+        self.ens210s = ens210s
 
         if cam:
             from cam import Cam

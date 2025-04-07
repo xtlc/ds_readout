@@ -1,12 +1,20 @@
 from serial import Serial, EIGHTBITS, STOPBITS_ONE, PARITY_NONE
 import os, time 
 from usbports import get_port
+from environs import Env
 
 class Temp:
-    def __init__(self, sensors):
+    def __init__(self):
         self.create_port()
         self.CR = "\x0D"
-        self.sensors = sensors
+        env = Env()
+        env.read_env()
+        self.sensors = ENS210s = {"top_left":  env("ENS210_TOP_LEFT"),
+                                  "bot_left":  env("ENS210_BOT_LEFT"), 
+                                  "top_mid":   env("ENS210_TOP_MID"), 
+                                  "bot_mid":   env("ENS210_BOT_MID"), 
+                                  "top_right": env("ENS210_TOP_RIGHT"),
+                                  "bot_right": env("ENS210_BOT_RIGHT"), }
 
     def create_port(self, ):
         p = get_port(devicetype="temp")
@@ -41,8 +49,7 @@ class Temp:
 
 
 if __name__ == "__main__":
-    ENS210s = {"top_left": "n", "bot_left": "o", "top_mid": "p", "bot_mid": "q", "top_right": "r", "bot_right": "s"}
-    t = Temp(sensors=ENS210s)
+    t = Temp()
     while True:
         print(t.get_all_temps())
         time.sleep(1)

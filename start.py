@@ -24,18 +24,11 @@ env.read_env()
 MUX = env("MUX")
 
 ## DS18B20s
-DS18B20s = {"in_ri":    env("DS18B20_IN_RIGHT"), 
-            "out_ri":   env("DS18B20_OUT_RIGHT"), 
-            "in_le":    env("DS18B20_IN_LEFT"), 
-            "out_le":   env("DS18B20_OUT_LEFT")}
+# DS18B20s = {"in_ri":    env("DS18B20_IN_RIGHT"), 
+#             "out_ri":   env("DS18B20_OUT_RIGHT"), 
+#             "in_le":    env("DS18B20_IN_LEFT"), 
+#             "out_le":   env("DS18B20_OUT_LEFT")}
 
-## ENS210
-ENS210s = {"top_left":  env("ENS210_TOP_LEFT"), 
-           "bot_left":  env("ENS210_BOT_LEFT"), 
-           "top_mid":   env("ENS210_TOP_MID"), 
-           "bot_mid":   env("ENS210_BOT_MID"), 
-           "top_right": env("ENS210_TOP_RIGHT"), 
-           "bot_right": env("ENS210_BOT_RIGHT"), }
 
 
 ## helper for the ENS210:
@@ -53,8 +46,6 @@ def to_terminal():
     from measure import Measurement
     m = Measurement(name_left=scale_left,
                     name_right=scale_right,
-                    pt100s=DS18B20s,
-                    ens210s=ENS210s,
                     measurements=0, 
                     sleep_time=3, 
                     foldername=foldername,
@@ -67,8 +58,6 @@ def to_influx():
     from measure import Measurement
     m = Measurement(name_left=scale_left,
                     name_right=scale_right,
-                    pt100s=DS18B20s,
-                    ens210s=ENS210s,
                     measurements=0, 
                     sleep_time=60, 
                     foldername=foldername,
