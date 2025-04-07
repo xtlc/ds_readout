@@ -14,6 +14,15 @@ class PT100:
         if PT100_WATER_OUT_LEFT:
             self.sensors["out_le"] = BASEDIR.joinpath(f"""28-{PT100_WATER_OUT_LEFT}""", "w1_slave")
 
+    def test(sef):
+        values = {}
+        for name, address in self.sensors.items():
+            with open(address, "r") as w1s:
+                data = w1s.read()
+                values[name] =  float(data.split("t=")[1])/1000
+        return values
+
+
     def get_temps(self):
         values = {}
         for name, address in self.sensors.items():
@@ -41,7 +50,7 @@ if __name__ == "__main__":
     #print("using", sensors)
     pt100s = PT100(PT100_WATER_IN_LEFT=env("DS18B20_IN_LEFT"), PT100_WATER_OUT_LEFT=env("DS18B20_OUT_LEFT"),
                    PT100_WATER_IN_RIGHT=env("DS18B20_IN_RIGHT"), PT100_WATER_OUT_RIGHT=env("DS18B20_OUT_RIGHT"))
-
+    pt100s.test()
 
     while True:
         t = pt100s.get_temps()
