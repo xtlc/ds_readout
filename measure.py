@@ -116,10 +116,12 @@ class Measurement:
                 p_01 = Point(db_name).field(f"{self.scale_left}_left", float(w["00"]) * 1000, ).time(now)
             except IndexError as E:
                 p_01 = Point(db_name).field(f"{self.scale_left}_left", float('nan')).time(now)
+                print("could not write a scale measurement to influx for scale_left")
             try:
                 p_02 = Point(db_name).field(f"{self.scale_right}_right", float(w["01"]) * 1000, ).time(now)
             except IndexError as E:
                 p_02 = Point(db_name).field(f"{self.scale_right}_right", float('nan')).time(now)
+                print("could not write a scale measurement to influx for scale_right")
             
             ## temperature values
             p_03 = Point(db_name).field(f"temp_scale_left_bot", t["temp_bot_left"]).time(now)
