@@ -31,14 +31,14 @@ if __name__ == "__main__":
 
     env = Env()
     env.read_env()
-    print("Test mode running ...")    # You can call your function here if needed
-    sensors = []
-    for item in BASEDIR.iterdir():
-        if item.is_dir() and item.name.startswith("28-"):
-            sensors.append(item.name[3:])
-            print(f"""found sensor: {item.name}""")
+    #print("Test mode running ...")    # You can call your function here if needed
+    #sensors = []
+    #for item in BASEDIR.iterdir():
+    #    if item.is_dir() and item.name.startswith("28-"):
+    #        sensors.append(item.name[3:])
+    #        print(f"""found sensor: {item.name}""")
     print("------------------------------ T E S T I N G ----------------------------------------------")
-    print("using", sensors)
+    #print("using", sensors)
     pt100s = PT100(PT100_WATER_IN_LEFT=env("DS18B20_IN_LEFT"), PT100_WATER_OUT_LEFT=env("DS18B20_OUT_LEFT"),
                    PT100_WATER_IN_RIGHT=env("DS18B20_IN_RIGHT"), PT100_WATER_OUT_RIGHT=env("DS18B20_OUT_RIGHT"))
 
