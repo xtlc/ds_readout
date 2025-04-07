@@ -43,6 +43,7 @@ class Measurement:
 
         try:
             self.scales = Mux(max_values=measurements, sleep_time=sleep_time)
+            print("MUX initialized ...")
         except Exception as E:
             print(f"scales could not be initialized, aborting")
             exit()
@@ -99,7 +100,7 @@ class Measurement:
             
             if hasattr(self, "scales"):
                 w = self.scales.get_all_weights()
-            if hasattr(self, "ens210s"):
+            if hasattr(self, "temps"):
                 t = self.temps.get_all_temps()
             if hasattr(self, "flows"):
                 f = self.flows.get_flow()
@@ -121,8 +122,6 @@ class Measurement:
                 p_02 = Point(db_name).field(f"{self.scale_right}_right", float('nan')).time(now)
             
             ## temperature values
-            import pdb
-            pdb.set_trace()
             p_03 = Point(db_name).field(f"temp_scale_left_bot", t["temp_bot_left"]).time(now)
             p_04 = Point(db_name).field(f"humid_scale_left_bot", t["humid_bot_left"]).time(now)
             p_05 = Point(db_name).field(f"temp_scale_left_top", t["temp_top_left"]).time(now)
