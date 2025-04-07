@@ -47,7 +47,7 @@ class Measurement:
             exit()
         
         self.flows = Flow()
-        self.pt100s = PT100(PT100_WATER_IN_RIGHT=pt100s["in_ri"], PT100_WATER_OUT_RIGHT=pt100s["out_ri"], PT100_WATER_IN_LEFT=pt100s["in_le"], PT100_WATER_OUT_LEFT=pt100s["out_le"])
+        self.pt100s = PT100()
         self.temps = ens210s
 
         if cam:
