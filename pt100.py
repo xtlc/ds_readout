@@ -14,7 +14,7 @@ class PT100:
         if PT100_WATER_OUT_LEFT:
             self.sensors["out_le"] = BASEDIR.joinpath(f"""28-{PT100_WATER_OUT_LEFT}""", "w1_slave")
 
-    def test(sef):
+    def test(self):
         values = {}
         for name, address in self.sensors.items():
             with open(address, "r") as w1s:
