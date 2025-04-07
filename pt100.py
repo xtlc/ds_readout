@@ -7,14 +7,11 @@ class PT100:
         env = Env()
         env.read_env()
         BASEDIR = Path("/sys/bus/w1/devices/")
-        if PT100_WATER_IN_RIGHT:
-            self.sensors["in_ri"] =  BASEDIR.joinpath(f"""28-{env("DS18B20_IN_RIGHT")}""", "w1_slave")
-        if PT100_WATER_OUT_RIGHT:
-            self.sensors["out_ri"] = BASEDIR.joinpath(f"""28-{env("DS18B20_OUT_RIGHT")}""", "w1_slave")
-        if PT100_WATER_IN_LEFT:
-            self.sensors["in_le"] =  BASEDIR.joinpath(f"""28-{env("DS18B20_IN_LEFT")}""", "w1_slave")
-        if PT100_WATER_OUT_LEFT:
-            self.sensors["out_le"] = BASEDIR.joinpath(f"""28-{env("DS18B20_OUT_LEFT")}""", "w1_slave")
+        self.sensors = {}
+        self.sensors["in_ri"] =  BASEDIR.joinpath(f"""28-{env("DS18B20_IN_RIGHT")}""", "w1_slave")
+        self.sensors["out_ri"] = BASEDIR.joinpath(f"""28-{env("DS18B20_OUT_RIGHT")}""", "w1_slave")
+        self.sensors["in_le"] =  BASEDIR.joinpath(f"""28-{env("DS18B20_IN_LEFT")}""", "w1_slave")
+        self.sensors["out_le"] = BASEDIR.joinpath(f"""28-{env("DS18B20_OUT_LEFT")}""", "w1_slave")
 
     def get_temps(self, testing=False):
         values = {}
