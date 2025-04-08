@@ -124,18 +124,18 @@ class Measurement:
                 print("could not write a scale measurement to influx for scale_right")
             
             ## temperature values
-            p_03 = Point(db_name).field(f"temp_scale_left_bot", t["temp_bot_left"]).time(now)
-            p_04 = Point(db_name).field(f"humid_scale_left_bot", t["humid_bot_left"]).time(now)
-            p_05 = Point(db_name).field(f"temp_scale_left_top", t["temp_top_left"]).time(now)
-            p_06 = Point(db_name).field(f"humid_scale_left_top", t["humid_top_left"]).time(now)
+            p_03 = Point(db_name).field(f"temp_left_bot", t["temp_bot_left"]).time(now)
+            p_04 = Point(db_name).field(f"humid_left_bot", t["humid_bot_left"]).time(now)
+            p_05 = Point(db_name).field(f"temp_left_top", t["temp_top_left"]).time(now)
+            p_06 = Point(db_name).field(f"humid_left_top", t["humid_top_left"]).time(now)
             p_07 = Point(db_name).field(f"temp_mid_bot", t["temp_bot_mid"]).time(now)
             p_08 = Point(db_name).field(f"humid_mid_bot", t["humid_bot_mid"]).time(now)
             p_09 = Point(db_name).field(f"temp_mid_top", t["temp_top_mid"]).time(now)
             p_10 = Point(db_name).field(f"humid_mid_top", t["humid_top_mid"]).time(now)
-            p_11 = Point(db_name).field(f"temp_scale_right_bot", t["temp_bot_right"]).time(now)
-            p_12 = Point(db_name).field(f"humid_scale_right_bot", t["humid_bot_right"]).time(now)
-            p_13 = Point(db_name).field(f"temp_scale_right_top", t["temp_top_right"]).time(now)
-            p_14 = Point(db_name).field(f"humid_scale_right_top", t["humid_top_right"]).time(now)
+            p_11 = Point(db_name).field(f"temp_right_bot", t["temp_bot_right"]).time(now)
+            p_12 = Point(db_name).field(f"humid_right_bot", t["humid_bot_right"]).time(now)
+            p_13 = Point(db_name).field(f"temp_right_top", t["temp_top_right"]).time(now)
+            p_14 = Point(db_name).field(f"humid_right_top", t["humid_top_right"]).time(now)
             
             ## flow values
             p_15 = Point(db_name).field(f"flow_left", float(f["flow_left"])).time(now)
@@ -179,7 +179,7 @@ class Measurement:
         head += f"\033[93mwtr_in_{self.scale_left}\033[39m | \033[93mwtr_out_{self.scale_left}\033[39m | \033[93mwtr_in_{self.scale_right}\033[39m | \033[93mwtr_out_{self.scale_right}\033[39m | \n"
         head += f"-" * 276
         
-        print(t)
+        # print(t)
 
         if counter % 10 == 0:
             print(head)
