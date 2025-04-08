@@ -1,10 +1,10 @@
 #!/usr/bin/python3
-import time, board, busio
+import board
 import numpy as np
 import adafruit_mlx90640, adafruit_tca9548a
 from datetime import datetime
 import cv2
-import cmapy
+import cmapy, time
 from scipy import ndimage
 from pathlib import Path
 
