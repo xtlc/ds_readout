@@ -3,8 +3,7 @@ import board
 import numpy as np
 import adafruit_mlx90640, adafruit_tca9548a
 from datetime import datetime
-import cv2
-import cmapy, time
+import cv2, cmapy, time
 from scipy import ndimage
 from pathlib import Path
 
@@ -121,7 +120,6 @@ class IRCam:
 
         cv2.putText(img, self.name_left, (10, 30), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.putText(img, self.name_right, (width - 10 - cv2.getTextSize(self.name_right, cv2.FONT_HERSHEY_DUPLEX, 1, 2)[0][0], 30), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-
         return img
 
     def _combine_images(self, thermal_image, color_scale):
