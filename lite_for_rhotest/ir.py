@@ -52,8 +52,28 @@ class IRCam2:
     def get_image(self, img_array, timestamp):
         img_L = img_array[:, :self.area[1]]
         img_R = img_array[:, self.area[2]:]
-        plt.imsave(f"""{timestamp}_left.png""", img_L.astype(np.float32), cmap="coolwarm")
-        plt.imsave(f"""{timestamp}_right.png""", img_R.astype(np.float32), cmap="coolwarm")
+        
+        # Create a figure with two subplots side-by-side
+        fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+        fig.suptitle("Infrared Images")
+    
+        # Display the left image on the first subplot
+        im_L = axs[0].imshow(img_L, cmap="coolwarm")
+        axs[0].set_title("Left Area")
+        axs[0].axis("off") # Hide axes for a cleaner image
+    
+        # Display the right image on the second subplot
+        im_R = axs[1].imshow(img_R, cmap="coolwarm")
+        axs[1].set_title("Right Area")
+        axs[1].axis("off") # Hide axes for a cleaner image
+    
+        # Add a single colorbar that applies to both images
+        # We use a mappable object (im_L or im_R) to link the colorbar to the data
+        cbar = fig.colorbar(im_L, ax=axs.ravel().tolist(), shrink=0.75, pad=0.05)
+        cbar.set_label("Temperature")
+    
+        plt.savefig(f"""{timestamp}_split_with_colorbar.png""", bbox_inches="tight")
+        plt.close(fig)
         return True
 
 class IRCam:
