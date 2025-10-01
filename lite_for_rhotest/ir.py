@@ -1,34 +1,47 @@
 #!/usr/bin/python3
-# import board
 import numpy as np
-# import adafruit_mlx90640, adafruit_tca9548a
-# from datetime import datetime
-# import cv2, cmapy, time
-# from scipy import ndimage
 from pathlib import Path
 import os, time, logging, serial
 from mi48 import MI48, format_header, format_framestats
 from utils import data_to_frame, connect_senxor
 from matplotlib import pyplot as plt
 from PIL import Image
+from influxdb_client import InfluxDBClient, Point 
+from influxdb_client.client.write_api import SYNCHRONOUS
+from datetime import datetime
 
 
 class IRCam2:
     BARWIDTH = 4
     PIXELS = [80, 62]
-    def __init__(self):
-        # This will enable mi48 logging debug messages
-        self.logger = logging.getLogger(__name__)
-        logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
-
+    def __init__(self, name_left, name_right, sleep_time, filename, db_name=None, bucket=None):
+        self.filename = filename
+        self.db_name = db_name
+        self.name_left = name_left
+        self.name_right = name_right
+        self.sleep_time = sleep_time
+        self.bucket = bucket
         self.mi48, connected_port, port_names = connect_senxor()
-
-        # print out camera info
-        # self.logger.info("Camera info:")
-        # self.logger.info(self.mi48.camera_info)
 
         # initiate single frame acquisition
         self.mi48.start(stream=False, with_header=True)
+        self.file = open(self.filename, mode="w", newline="")
+        self.csvwriter = csv.writer(self.file)
+        self.csvwriter.writerow(f"""timestamp/t{self.name_left}\t{self.name_right}""")
+
+        # InfluxDB parameters
+        if self.bucket:
+            self.token = env("INFLUX_TOKEN")
+            self.org = "abaton_influx"
+            self.host = "https://eu-central-1-1.aws.cloud2.influxdata.com"
+            self.host = "127.0.0.1:8186"
+            self.bucket = self.bucket
+            self.client = InfluxDBClient(url=self.host, token=self.token, org=self.org)
+
+        while True:
+            self.timestamp = f"""{time.strftime("%Y%m%d_%H%M%S")}"""
+            self.shoot(timestamp=timestamp)
+            time.sleep(self.sleep_time)
 
     def shoot(self, timestamp=f"""{time.strftime("%Y%m%d_%H%M%S")}"""):
         self.mi48.start(stream=False, with_header=True)
@@ -39,6 +52,17 @@ class IRCam2:
         fn = self.get_image(img_array=img, timestamp=timestamp)
         print(a, "---", b)
         print(self.area)
+        if self.bucket != None:
+            self.to_influx(v1=a, v2=b)
+        self.write_to_csv(timestamp=timestamp, v1=a, v2=b)
+        return None
+
+    def to_influx(self, v1, v2):
+        now = datetime.utcnow().replace(microsecond=0)
+        write_to_influx = self.client.write_api(write_options=SYNCHRONOUS)
+        p1 = Point(self.db_name).field(self.name_left, float(v1) * 1000, ).time(now)
+        p2 = Point(self.db_name).field(self.name_right, float(v2) * 1000, ).time(now)
+        write_to_influx.write(bucket=self.bucket, record=[p1, p2])
         return None
 
     def get_area(self):
@@ -52,170 +76,15 @@ class IRCam2:
     def get_image(self, img_array, timestamp):
         img_L = img_array[:, :self.area[1]]
         img_R = img_array[:, self.area[2]:]
-        
-        # Create a figure with two subplots side-by-side
-        fig, axs = plt.subplots(1, 2, figsize=(10, 5))
-        fig.suptitle("Infrared Images")
-    
-        # Display the left image on the first subplot
-        im_L = axs[0].imshow(img_L, cmap="coolwarm")
-        axs[0].set_title("Left Area")
-        axs[0].axis("off") # Hide axes for a cleaner image
-    
-        # Display the right image on the second subplot
-        im_R = axs[1].imshow(img_R, cmap="coolwarm")
-        axs[1].set_title("Right Area")
-        axs[1].axis("off") # Hide axes for a cleaner image
-    
-        # Add a single colorbar that applies to both images
-        # We use a mappable object (im_L or im_R) to link the colorbar to the data
-        cbar = fig.colorbar(im_L, ax=axs.ravel().tolist(), shrink=0.75, pad=0.05)
-        cbar.set_label("Temperature")
-    
-        plt.savefig(f"""{timestamp}_split_with_colorbar.png""", bbox_inches="tight")
-        plt.close(fig)
+        plt.imsave(f"""{timestamp}_left.png""", img_L.astype(np.float32), cmap="coolwarm")
+        plt.imsave(f"""{timestamp}_right.png""", img_R.astype(np.float32), cmap="coolwarm")
         return True
 
-class IRCam:
-    def __init__(self, image_width:int=1200, image_height:int=900, foldername="rclone", name_left=None, name_right=None):
-        self.image_width=image_width
-        self.image_height=image_height
-        self.output_folder=Path.cwd().joinpath(foldername)
-        self._setup_tca9548a()
-        self._t0 = time.time()
-        self.Tmin = 5
-        self.Tmax = 30
-        self.name_left = name_left
-        self.name_right = name_right
-        
-    def _setup_tca9548a(self):
-        _i2c = board.I2C()
-        self.tca = adafruit_tca9548a.TCA9548A(_i2c) # -> erkennt: Channel 0:['0x33'], Channel 1:['0x33'] ...
-        # print("TCA9548A setup complete")
+    def write_to_csv(self, timestamp, v1,v 2): 
+        self.writecsvwriterr.writerow([timestamp, v1, v2])
 
-    def _temps_to_rescaled_uints(self, f):
-        """Function to convert temperatures to pixels on image"""
-        f=np.nan_to_num(f)
-        norm = np.uint8((f - self.Tmin) * 255 / (self.Tmax - self.Tmin))
-        norm.shape = (24, 32)
-        return norm
-
-    def _pull_raw_image(self):
-        """Get one pull of the raw image data"""
-        # Get image
-        self._raw_image = np.zeros((24*32,))
-        try:
-            self.mlx.getFrame(self._raw_image)  # read mlx90640
-            self._raw_image=self._temps_to_rescaled_uints(self._raw_image)
-        except ValueError:
-            print("Math error; continuing...")
-            self._raw_image = np.zeros((24*32,))  # If something went wrong, make sure the raw image has numbers
-        except OSError:
-            print("IO Error; continuing...")
-            self._raw_image = np.zeros((24*32,))  # If something went wrong, make sure the raw image has numbers
-    
-    def save_image(self, channel: int):
-        """Save the current frame as a snapshot to the output folder."""
-
-        ## the camera used
-        self.mlx = adafruit_mlx90640.MLX90640(self.tca[channel])
-        self.mlx.refresh_rate = adafruit_mlx90640.RefreshRate.REFRESH_4_HZ  # set refresh rate
-        time.sleep(0.1)
-
-        self._pull_raw_image()
-        self._process_raw_image()
-        
-        # Create the color scale
-        color_scale = self._create_color_scale()
-            
-        # Combine the thermal image and the color scale
-        combined_image = self._combine_images(self._image, color_scale)
-
-        # add captures
-        img_with_catpures = self._add_captures(img=combined_image)
-            
-        fname = self.output_folder.joinpath(f"""IR_channel_{channel}_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.jpg""")
-        cv2.imwrite(fname, img_with_catpures)
-        # print("Thermal Image ", fname, "saved")
-        self.tca[channel].unlock()
-
-    def _create_color_scale(self):
-        """Create a horizontal color scale image with labels."""
-        # Create a gradient from Tmin to Tmax
-        gradient = np.linspace(self.Tmin, self.Tmax, 256).astype(np.float32)
-        
-        # Normalize the gradient to uint8
-        norm_gradient = np.uint8((gradient - self.Tmin) * 255 / (self.Tmax - self.Tmin))
-        
-        # Reshape to a 1D image (1 row, 256 columns)
-        norm_gradient = norm_gradient.reshape((1, 256))
-
-        # Apply the color map
-        color_scale = cv2.applyColorMap(norm_gradient, cv2.COLORMAP_JET)  # Use OpenCV's built-in colormap
-        
-        # Resize the color scale to a desired width and height (horizontal)
-        color_scale = cv2.resize(color_scale, (1200, 50))  # Width: 800px, Height: 50px
-
-        # Draw the text on the color scale
-        cv2.putText(color_scale, f"{self.Tmin}", (0, 30),    cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
-        cv2.putText(color_scale, f"10",          (280, 30),  cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
-        cv2.putText(color_scale, f"20",          (580, 30),  cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
-        cv2.putText(color_scale, f"30",          (880, 30),  cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
-        cv2.putText(color_scale, f"{self.Tmax}", (1170, 30), cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
-
-        return color_scale
-
-    def _add_captures(self, img):
-        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        
-        # Get the dimensions of the image
-        height, width, _ = img.shape
-
-        # Get the size of the text to be added
-        now_size = cv2.getTextSize(now, cv2.FONT_HERSHEY_DUPLEX, 1, 2)[0]
-        
-        # Calculate the position for the text to be centered
-        now_x = (width - now_size[0]) // 2
-
-        # Add the text to the image
-        cv2.putText(img, now, (now_x, 30), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-
-        # adding names
-        if not self.name_left:
-            self.name_let = "left" 
-        if not self.name_right:
-            self.name_right = "right"
-
-        cv2.putText(img, self.name_left, (10, 30), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-        cv2.putText(img, self.name_right, (width - 10 - cv2.getTextSize(self.name_right, cv2.FONT_HERSHEY_DUPLEX, 1, 2)[0][0], 30), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-        return img
-
-    def _combine_images(self, thermal_image, color_scale):
-        """Combine the thermal image with the horizontal color scale."""
-        # Resize the thermal image to maintain aspect ratio
-        thermal_image_resized = cv2.resize(thermal_image, (self.image_width, self.image_height))
-        
-        # Create a new image with space for the color scale
-        combined_image = np.zeros((thermal_image_resized.shape[0] + color_scale.shape[0], thermal_image_resized.shape[1], 3), dtype=np.uint8)
-        
-        # Place the thermal image in the combined image
-        combined_image[:thermal_image_resized.shape[0], :thermal_image_resized.shape[1]] = thermal_image_resized
-        
-        # Place the color scale in the combined image below the thermal image
-        combined_image[thermal_image_resized.shape[0]:, :color_scale.shape[1]] = color_scale
-        return combined_image
-    
-    def _process_raw_image(self):
-        self._image = ndimage.zoom(self._raw_image, 25)  # interpolate with scipy
-        self._image = np.clip(self._image, 0, 255) # clip values to be in range [0 ... 255]
-        self._image = self._image.astype(np.uint8) #convert to uint8
-        self._image = cv2.applyColorMap(self._image, cv2.COLORMAP_JET)
-        self._image = cv2.flip(self._image, 1)
 
 if __name__ == "__main__":
     irc = IRCam2()
     irc.shoot()
-  #  irc.save_image(channel=0)
-  #  print("chan0 done, now chan1")
-  #  irc.save_image(channel=1)
     print("all done")
