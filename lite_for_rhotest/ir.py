@@ -39,7 +39,6 @@ class IRCam2:
             self.token = token
             self.org = "abaton_influx"
             self.host = "https://eu-central-1-1.aws.cloud2.influxdata.com"
-            self.host = "127.0.0.1:8186"
             self.client = InfluxDBClient(url=self.host, token=self.token, org=self.org)
 
     def shoot_once(self, timestamp):
